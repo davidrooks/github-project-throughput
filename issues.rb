@@ -1,38 +1,21 @@
-require 'json'
-require 'time'
-require 'rest-client'
-require 'logger'
-require 'yaml'
-
-
+require './github.rb'
 
 class Issues 
     CONFIG = YAML.load_file('./config.yml')    
-    GITHUB_API = 'https://api.github.com/search/issues'
-    QUERY = {'q' => 'repo:' + 'sky-uk/atlas-youi', 'per_page' => 100, 'sort' => 'created', 'direction' => 'desc', 'project' => CONFIG['PROJECT']}
+    ISSUES_PATH = '/search/issues'
+    QUERY = {'q' => 'repo:' + CONFIG['REPO'], 'per_page' => 100, 'sort' => 'created', 'direction' => 'desc', 'project' => CONFIG['PROJECT']}
     
     def initialize    
-        @logger = Logger.new('logs.log', 'monthly')
-        @logger.level = CONFIG['LOG_LEVEL'] || Logger::DEBUG
-        RestClient.log = @logger
+       super()
     end 
-  
-  
-    def hasNextPage link
-      if link.nil? 
-        return false
-      else 
-        return link.include? 'next'
-      end
-    end
-  
+    
     def getData
       kanban = Hash.new()
   
       @logger.debug 'getting issues from ' + GITHUB_API
       issues = []
       begin
-        result = RestClient.get GITHUB_API, :params => QUERY, :accept => :json, :'Authorization' => 'token ' + CONFIG['OAUTH']
+        result = RestClient.get GITHUB_API + ISSUES_PATH, :params => QUERY, :accept => :json, :'Authorization' => 'token ' + CONFIG['OAUTH']
         issues += JSON.parse(result)['items']
   
         while hasNextPage(result.headers[:link])

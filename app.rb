@@ -3,7 +3,7 @@ require 'time'
 require 'rest-client'
 require 'sinatra/base'
 require 'tilt/erb'
-require './issues.rb'
+require './project.rb'
 
 class App < Sinatra::Base  
   get '/' do
@@ -61,7 +61,7 @@ class App < Sinatra::Base
   end
 
   def getCumulativeFlowData()
-    data = getData(['TIME','DONE', 'OPEN'])
+    data = getData(['TIME','DONE', 'BLOCKED', 'READY FOR DESIGN', 'IN DESIGN', 'READY FOR DEV', 'IN DEVELOPMENT', 'IN REVIEW', 'IN TEST', 'TO DO'])    
     data.each_with_index do |d, i|
       if i <= 1 
         next 
@@ -79,7 +79,7 @@ class App < Sinatra::Base
     response = []
     response << format
 
-    data = Issues.new()    
+    data = Project.new()    
     data = data.getData()
 
     min_date = Date.parse(data.keys.sort.first)
@@ -96,7 +96,7 @@ class App < Sinatra::Base
           if key == 'TIME'
             new[0] = d.iso8601
           else            
-            new[index] = data[d.iso8601][key.to_sym] || 0
+            new[index] = data[d.iso8601][key] || 0
           end
         end
         response << new
