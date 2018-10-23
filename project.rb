@@ -1,11 +1,18 @@
 require './github.rb'
 
 class Project < Github
-    PROJECTS_PATH = '/projects/' + CONFIG['PROJECT'] + '/columns'       
+    PROJECT_PATH = '/projects/' + CONFIG['PROJECT'] + '/columns'  
+    PROJECTS_PATH = '/repos/' + CONFIG['REPO'] + '/projects'
     
     def initialize    
         super()
     end     
+
+    #   can be used to find the ID of your github projects as this is not exposed by github website
+    def getProjectID()
+        result = RestClient.get GITHUB_API + PROJECTS_PATH, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
+        result = JSON.parse(result)                     
+    end 
   
     def getData
       board = Hash.new()
@@ -14,8 +21,8 @@ class Project < Github
       @logger.debug 'getting issues from ' + GITHUB_API
       issues = []
       begin
-        result = RestClient.get GITHUB_API + PROJECTS_PATH, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
-        columns = JSON.parse(result)        
+        result = RestClient.get GITHUB_API + PROJECT_PATH, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
+        columns = JSON.parse(result)      
         columns.each do |col|   
             cards = []                      
             result = RestClient.get col['cards_url'], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
