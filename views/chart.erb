@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <%= erb :imports %>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable(<%= @data %>);
+
+        <% if @type=="ComboChart" %>
+        var options = {
+          title: '<%= @title %>',
+          hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}, showTextEvery: 5},
+          vAxis: {title: 'Tasks', minValue: 0},
+          seriesType: 'bars',
+          series: {1: {type: 'line'}}
+        };
+
+
+        var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+        <% else %>
+
+        var options = {
+          isStacked: <%= @stacked %>,
+          title: '<%= @title %>',
+          hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}, showTextEvery: 5},
+          vAxis: {title: 'Tasks', minValue: 0},
+        };
+
+
+        var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+        <% end %>
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <%= erb :menu %>
+    <div id="chart_div" style="width: 1800px; height: 800px;"></div>
+  </body>
+</html>
