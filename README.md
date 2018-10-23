@@ -19,6 +19,7 @@ This is a handy tool for checking out team velocity, throughput, wip, cycle time
 
 1. REQUIRED: OAUTH - the oauth token of your github repo
 2. REQUIRED: GITHUB_PROJECT - the path to your project 
-3. OPTIONAL: LOG_LEVEL - debug, info, warn, error, fatal
+3. REQUIRED: REPO - the path to your github repo
+4. OPTIONAL: LOG_LEVEL - debug, info, warn, error, fatal
 
 
