@@ -10,7 +10,7 @@
         <% if @type=="ComboChart" %>
         var options = {
           title: '<%= @title %>',
-          hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}, showTextEvery: 5},
+          hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}, showTextEvery: 2},
           vAxis: {title: 'Tasks', minValue: 0},
           seriesType: 'bars',
           series: {1: {type: 'line'}}

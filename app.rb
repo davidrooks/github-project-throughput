@@ -43,7 +43,7 @@ class App < Sinatra::Base
   end
 
   def getThroughputData()
-    data = getData(['TIME','THROUGHPUT'])
+    data = getData(['TIME','DONE'])
     avg = data[1..data.length+1].map {|row| row[1]}.inject(:+).to_f / (data.size-1)
     data.each_with_index do |d,i|
       if i == 0
