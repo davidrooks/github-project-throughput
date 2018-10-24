@@ -4,8 +4,11 @@ require 'rest-client'
 require 'sinatra/base'
 require 'tilt/erb'
 require './project.rb'
+require 'yaml'
 
-class App < Sinatra::Base  
+class App < Sinatra::Base    
+  CONFIG = YAML.load_file('./config.yml')  
+
   get '/' do
     redirect '/cumulative-flow-diagram'
   end
@@ -43,7 +46,7 @@ class App < Sinatra::Base
   end
 
   def getThroughputData()
-    data = getData(['TIME','DONE'])    
+    data = getData(['TIME'].concat(CONFIG['THROUGHPUT_MAP']))    
     data.each_with_index do |d,i|
       avg = data[1..i].map {|row| row[1]}.inject(:+).to_f / (i)
       if i == 0
@@ -57,11 +60,11 @@ class App < Sinatra::Base
   end
 
   def getWIPData()
-    return getData(['TIME', 'CYCLE TIME','WIP'])
+    return getData(CONFIG['WIP_MAP'])
   end
 
   def getCumulativeFlowData()
-    data = getData(['TIME','DONE', 'BLOCKED', 'READY FOR DESIGN', 'IN DESIGN', 'READY FOR DEV', 'IN DEVELOPMENT', 'IN REVIEW', 'IN TEST', 'TO DO'])    
+    data = getData(['TIME'].concat(CONFIG['CUMULATIVE_MAP']))    
     data.each_with_index do |d, i|
       if i <= 1 
         next 
@@ -106,7 +109,7 @@ class App < Sinatra::Base
       end
     }
     return response
-  end
+  end  
 end
 
 
