@@ -32,7 +32,7 @@
         <div class="content">                
             <div class="row row-eq-height">
 
-                <div class="col-sm-6 col-lg-3 d-flex">
+                <div class="col-sm d-flex">
                     <div class="card text-white <%= @warn ? "bg-flat-color-4" : "bg-flat-color-5" %>">
                         <div class="card-body pb-0">  
                             <div class="stat-widget-one">
@@ -55,7 +55,7 @@
                 </div>
                 <!--/.col-->
 
-                <div class="col-sm-6 col-lg-3 d-flex">
+                <div class="col-sm d-flex">
                     <div class="card text-white bg-flat-color-1">
                         <div class="card-body pb-0">
                             <div class="stat-widget-one">
@@ -74,7 +74,7 @@
                 </div>
                 <!--/.col-->            
 
-                <div class="col-sm-6 col-lg-3 d-flex">
+                <div class="col-sm d-flex">
                     <div class="card text-white bg-flat-color-1">
                         <div class="card-body pb-0">  
                             <div class="stat-widget-one">
@@ -97,12 +97,12 @@
                 </div>
                 <!--/.col-->           
 
-                <div class="col-sm-6 col-lg-3 d-flex">
+                <div class="col-sm d-flex">
                     <div class="card text-white <%= @required_throughput > @throughput ? "bg-flat-color-4" : "bg-flat-color-5" %>">
                         <div class="card-body">                        
                             <div class="stat-widget-one">
                                 <div class="stat-icon dib">
-                                    <i class="<%= @required_throughput > @throughput ? "ti-stats-up" : "ti-stats-down" %>""></i>    
+                                    <i class="<%= @required_throughput > @throughput ? "ti-stats-up" : "ti-stats-down" %>"></i>    
                                 </div>
                                 <div class="stat-content dib">
                                     <span class="count"><%= @throughput %></span>
