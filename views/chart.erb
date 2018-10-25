@@ -9,7 +9,7 @@
 
         <% if @type=="ComboChart" %>
         var options = {
-          title: '<%= @title %>',
+          title: '',
           hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}, showTextEvery: 2},
           vAxis: {title: 'Tasks', minValue: 0},
           seriesType: 'bars',
@@ -22,7 +22,7 @@
 
         var options = {
           isStacked: <%= @stacked %>,
-          title: '<%= @title %>',
+          title: '',
           hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}, showTextEvery: 2},
           vAxis: {title: 'Tasks', minValue: 0},
         };
@@ -36,6 +36,11 @@
   </head>
   <body>
     <%= erb :menu %>
+    <H1><%= @title %></H1>
+    <% if @type=="ComboChart" %>
+      <H3>Based on current throughput expected project completion date = <%= @project_end_date %> </H2>
+      <H3>Required throughput = <%= @required_throughput %> tickets per day</H2>
+    <% end %>
     <div id="chart_div" style="width: 1800px; height: 800px;"></div>
   </body>
 </html>

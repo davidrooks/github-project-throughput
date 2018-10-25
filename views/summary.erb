@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <%= erb :imports %>
+  </head>
+  <body>
+    <%= erb :menu %>
+    <H1><%= @title %></H1>
+    <div class="container d-flex">
+    <div class="bg-info">
+        <H2>Tickets</H2>
+        <H3><%= @open_tickets %> OPEN</H3>
+        <h3><%= @closed_tickets %> DONE</H3>        
+    </div>
+    <div class="<%= @warn ? "bg-danger" : "bg-success" %>">
+        <H2>Delivery</H2>
+        <H3>Target delivery date = <%= @target_delivery_date %></H3>
+        <H3>Current throughput = <%= @throughput %> tickets per day</H3>  
+        <H3>Work days remaining = <%= @work_days_remaining %></H3>
+        <H3>Based on current throughput our delivery date is <%= @projected_delivery_date %></H3>
+        <H3>We need a throughput of <%= @required_throughput %> to hit <%= @target_delivery_date %></H3>
+    </div>    
+    <div>
+  </body>
+</html>

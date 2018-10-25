@@ -13,34 +13,39 @@ class Project < Github
         result = RestClient.get GITHUB_API + PROJECTS_PATH, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
         result = JSON.parse(result)                     
     end 
+
+    def refresh
+        board = Hash.new()
+        @logger.debug 'getting issues from ' + GITHUB_API        
+        begin
+            result = RestClient.get GITHUB_API + PROJECT_PATH, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
+            columns = JSON.parse(result)      
+            columns.each do |col|   
+                cards = []                      
+                result = RestClient.get col['cards_url'], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
+                cards += JSON.parse(result)
+                while hasNextPage(result.headers[:link])                
+                    result = result = RestClient.get result.headers[:link].split(';')[0][1...-1], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
+                    cards += JSON.parse(result)
+                end       
+                board[col['name']] = cards     
+            end        
+                    
+        rescue Exception => e
+            @logger.debug '-----------------------'
+            @logger.debug  'exception!'
+            @logger.debug e.to_s
+            @logger.debug e.backtrace
+            @logger.debug '-----------------------'
+        end
+        return board
+    end
+
   
-    def getData
-      board = Hash.new()
+    def getData      
       kanban = Hash.new()
   
-      @logger.debug 'getting issues from ' + GITHUB_API
-      issues = []
-      begin
-        result = RestClient.get GITHUB_API + PROJECT_PATH, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
-        columns = JSON.parse(result)      
-        columns.each do |col|   
-            cards = []                      
-            result = RestClient.get col['cards_url'], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
-            cards += JSON.parse(result)
-            while hasNextPage(result.headers[:link])                
-                result = result = RestClient.get result.headers[:link].split(';')[0][1...-1], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
-                cards += JSON.parse(result)
-            end       
-            board[col['name']] = cards     
-        end        
-                 
-      rescue Exception => e
-        @logger.debug '-----------------------'
-        @logger.debug  'exception!'
-        @logger.debug e.to_s
-        @logger.debug e.backtrace
-        @logger.debug '-----------------------'
-      end
+      board = refresh()
        
       board.each do |column, cards|
         cards.each do |card|                        

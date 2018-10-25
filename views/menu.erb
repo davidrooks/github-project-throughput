@@ -1,9 +1,11 @@
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <ul class="nav navbar-nav">
-      <li class="<%= active_page?("cumulative-flow-diagram") ? "active" : ""  %>"><a href="/cumulative-flow-diagram">Cumulative Flow</a></li>
-      <!-- <li class="<%= active_page?("work-in-progress") ? "active" : "" %>"><a href="/work-in-progress">WIP</a></li> -->
-      <li class="<%= active_page?("throughput") ? "active" : "" %>"><a href="/throughput">Throughput</a></li>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
+    <ul class="nav">
+      <li class="nav-item <%= active_page?("summary") ? "active" : ""  %>"><a class="nav-link" href="/summary">Summary</a></li>
+      <li class="nav-item <%= active_page?("cumulative-flow-diagram") ? "active" : ""  %>"><a class="nav-link" href="/cumulative-flow-diagram">Cumulative Flow</a></li>      
+      <li class="nav-item <%= active_page?("throughput") ? "active" : "" %>"><a class="nav-link" href="/throughput">Throughput</a></li>
+    </ul>
+    <ul class="nav">
+      <li class="nav-item"><a class="nav-link" href="/refesh">Refresh Data</a></li>
     </ul>
   </div>
 </nav>
