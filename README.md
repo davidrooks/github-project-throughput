@@ -21,7 +21,8 @@ This is a handy tool for checking out team velocity, throughput, wip, cycle time
 2. REQUIRED: GITHUB_PROJECT - the path to your project 
 3. REQUIRED: REPO - the path to your github repo
 4. REQUIRED: THROUGHPUT_MAP - the names of the columns you want displayed on this chart. NOTE: throughput is calculated based on combined average of these columns.
-4. REQUIRED: CUMULATIVE_MAP  - the names of the columns you want displayed on this chart. 
-4. OPTIONAL: LOG_LEVEL - debug, info, warn, error, fatal
+5. REQUIRED: CUMULATIVE_MAP  - the names of the columns you want displayed on this chart. 
+6. OPTIONAL: COLORS - the colours you want to use to represent each column in the cumulative flow chart
+7. OPTIONAL: LOG_LEVEL - debug, info, warn, error, fatal
 
 

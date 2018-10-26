@@ -3,6 +3,8 @@ require './github.rb'
 class Project < Github
     PROJECT_PATH = '/projects/' + CONFIG['PROJECT'] + '/columns'  
     PROJECTS_PATH = '/repos/' + CONFIG['REPO'] + '/projects'
+
+    $BOARD = Hash.new()
     
     def initialize    
         super()
@@ -14,7 +16,7 @@ class Project < Github
         result = JSON.parse(result)                     
     end 
 
-    def refresh
+    def getProjectData()
         board = Hash.new()
         @logger.debug 'getting issues from ' + GITHUB_API        
         begin
@@ -38,14 +40,14 @@ class Project < Github
             @logger.debug e.backtrace
             @logger.debug '-----------------------'
         end
-        return board
+        $BOARD = board
     end
 
   
-    def getData      
+    def transformData()      
       kanban = Hash.new()
   
-      board = refresh()
+      board = $BOARD
        
       board.each do |column, cards|
         cards.each do |card|                        

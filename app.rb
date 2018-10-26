@@ -10,7 +10,8 @@ require 'date'
 class App < Sinatra::Base    
   CONFIG = YAML.load_file('./config.yml')  
   PROJECT = Project.new()
-  PROJECT_DATA = PROJECT.getData()
+  PROJECT.getProjectData()
+  $PROJECT_DATA = PROJECT.transformData()
   $ROUTE = '/'
 
   def active_page?(path='')
@@ -26,7 +27,8 @@ class App < Sinatra::Base
     xmas_holidays = 10
     today = Date.today
     target_delivery_date = Date.parse("14/02/2019")
-    @cumulative_data = getCumulativeFlowData    
+    @cumulative_data = getCumulativeFlowData   
+    @title = 'Cummulative Flow' 
     @type = 'AreaChart'
     @stacked = true
     @open_tickets = @cumulative_data.last[2..-1].sum
@@ -44,12 +46,14 @@ class App < Sinatra::Base
     @target_delivery_date = target_delivery_date.iso8601
     @required_throughput = required_throughput.round(2)
     @warn = projected_delivery_date > target_delivery_date
+    @colors = CONFIG['COLORS']
     
     erb :index
   end
 
-  get '/refresh' do    
-    PROJECT_DATA = PROJECT.refresh
+  get '/refresh' do  
+    PROJECT.getProjectData()  
+    $PROJECT_DATA = PROJECT.transformData()
     redirect '/summary'
   end
 
@@ -104,21 +108,22 @@ class App < Sinatra::Base
     response = []
     response << format
   
-    min_date = Date.parse(PROJECT_DATA.keys.sort.first)
-    max_date = Date.parse(PROJECT_DATA.keys.sort.last)
+    puts $PROJECT_DATA
+    min_date = Date.parse($PROJECT_DATA.keys.sort.first)
+    max_date = Date.parse($PROJECT_DATA.keys.sort.last)
 
     current = []
     min_date.upto(max_date) { |d|
       if d.saturday? || d.sunday?
         next
       end
-      if PROJECT_DATA.has_key? d.iso8601
+      if $PROJECT_DATA.has_key? d.iso8601
         new = []
         format.each_with_index do |key, index|
           if key == 'TIME'
             new[0] = d.iso8601
           else            
-            new[index] = PROJECT_DATA[d.iso8601][key] || 0
+            new[index] = $PROJECT_DATA[d.iso8601][key] || 0
           end
         end
         response << new
