@@ -108,7 +108,6 @@ class App < Sinatra::Base
     response = []
     response << format
   
-    puts $PROJECT_DATA
     min_date = Date.parse($PROJECT_DATA.keys.sort.first)
     max_date = Date.parse($PROJECT_DATA.keys.sort.last)
 
