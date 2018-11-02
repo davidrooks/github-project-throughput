@@ -24,5 +24,6 @@ This is a handy tool for checking out team velocity, throughput, wip, cycle time
 5. REQUIRED: CUMULATIVE_MAP  - the names of the columns you want displayed on this chart. 
 6. OPTIONAL: COLORS - the colours you want to use to represent each column in the cumulative flow chart
 7. OPTIONAL: LOG_LEVEL - debug, info, warn, error, fatal
+8. OPTIONAL: TITLE - the title of the website
 
 

@@ -12,6 +12,7 @@ class App < Sinatra::Base
   PROJECT = Project.new()
   PROJECT.getProjectData()
   $PROJECT_DATA = PROJECT.transformData()
+  # $PROJECT_DATA = {"2018-10-15"=>{"TO DO"=>8, "DONE"=>3}, "2018-10-29"=>{"TO DO"=>3, "BLOCKED"=>3, "READY FOR DEV"=>1, "IN DEVELOPMENT"=>1, "IN TEST"=>1, "FUNCTIONAL TEST AUTOMATION"=>1}, "2018-10-19"=>{"TO DO"=>1, "READY FOR DESIGN"=>1, "READY FOR DEV"=>8}, "2018-10-17"=>{"TO DO"=>1, "READY FOR DEV"=>8, "IN DEVELOPMENT"=>2, "DONE"=>1}, "2018-10-23"=>{"BLOCKED"=>8}, "2018-10-24"=>{"BLOCKED"=>1, "DONE"=>1}, "2018-10-18"=>{"READY FOR DESIGN"=>2, "READY FOR DEV"=>1}, "2018-10-31"=>{"IN DESIGN"=>1, "READY FOR DEV"=>3, "IN DEVELOPMENT"=>1, "IN REVIEW"=>2, "DONE"=>1}, "2018-10-30"=>{"READY FOR DEV"=>3, "IN DEVELOPMENT"=>1, "IN REVIEW"=>1, "DONE"=>4}, "2018-11-01"=>{"READY FOR DEV"=>1, "FUNCTIONAL TEST AUTOMATION"=>1, "DONE"=>1}, "2018-10-26"=>{"READY FOR DEV"=>11, "IN TEST"=>1, "DONE"=>4}, "2018-10-22"=>{"READY FOR DEV"=>2, "IN DEVELOPMENT"=>3}, "2018-10-16"=>{"IN DEVELOPMENT"=>1, "DONE"=>1}}  
   $ROUTE = '/'
 
   def active_page?(path='')
@@ -28,7 +29,7 @@ class App < Sinatra::Base
     today = Date.today
     target_delivery_date = Date.parse("14/02/2019")
     @cumulative_data = getCumulativeFlowData   
-    @title = 'Cummulative Flow' 
+    @title = CONFIG['TITLE']
     @type = 'AreaChart'
     @stacked = true
     @open_tickets = @cumulative_data.last[2..-1].sum
@@ -89,19 +90,21 @@ class App < Sinatra::Base
     return data
   end
 
-  def getCumulativeFlowData()
+  def getCumulativeFlowData()    
     data = getData(['TIME'].concat(CONFIG['CUMULATIVE_MAP']))    
-    data.each_with_index do |d, i|
+
+    data.each_with_index do |d, i|         
       if i <= 1 
         next 
       end 
       x = 1
-      while x < d.length
-        data[i][x] += data[i-1][x]
+      while x < d.length        
+        data[i][x] += data[i-1][x]        
         x += 1
-      end
+      end      
     end 
-    data
+
+    data    
   end
 
   def getData(format)
@@ -109,28 +112,27 @@ class App < Sinatra::Base
     response << format
   
     min_date = Date.parse($PROJECT_DATA.keys.sort.first)
-    max_date = Date.parse($PROJECT_DATA.keys.sort.last)
-
-    current = []
-    min_date.upto(max_date) { |d|
+    max_date = Date.today
+    
+    previous = []
+    min_date.upto(max_date) do |d|
       if d.saturday? || d.sunday?
         next
-      end
-      if $PROJECT_DATA.has_key? d.iso8601
-        new = []
-        format.each_with_index do |key, index|
-          if key == 'TIME'
-            new[0] = d.iso8601
-          else            
-            new[index] = $PROJECT_DATA[d.iso8601][key] || 0
-          end
+      end             
+      current = []
+      format.each_with_index do |key, index|
+        if key == 'TIME'
+          current[0] = d.iso8601
+        else            
+          if $PROJECT_DATA.has_key? d.iso8601
+            current[index] = $PROJECT_DATA[d.iso8601][key] || 0
+          else
+            current[index] = 0
+          end 
         end
-        response << new
-        current = new
-      else
-        response << current
       end
-    }
+      response << current     
+    end
     return response
   end  
 end

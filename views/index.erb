@@ -2,7 +2,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Youi.tv team dashboard</title>
+    <title><%= @title %></title>
     
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -129,7 +129,7 @@
                 <div class="container-fluid">
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="card-title mb-0 text-center"><%= @title %></h3>
+                            <h3 class="card-title mb-0 text-center">Cumulative Flow</h3>
                             <div class="d-flex justify-content-center bg-white pt-3">
                                 <ul class="row d-flex justify-content-between list-inline">
                                     <% @cumulative_data[0][1..-1].each_with_index do |data, index| %>

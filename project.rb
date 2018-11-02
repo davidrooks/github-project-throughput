@@ -22,15 +22,18 @@ class Project < Github
         begin
             result = RestClient.get GITHUB_API + PROJECT_PATH, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
             columns = JSON.parse(result)      
+            
             columns.each do |col|   
                 cards = []                      
-                result = RestClient.get col['cards_url'], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
+                result = RestClient.get col['cards_url'], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']                
                 cards += JSON.parse(result)
                 while hasNextPage(result.headers[:link])                
                     result = result = RestClient.get result.headers[:link].split(';')[0][1...-1], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
                     cards += JSON.parse(result)
                 end       
                 board[col['name']] = cards     
+                @logger.debug "cards for column #{col['name']}"
+                @logger.debug cards.to_json
             end        
                     
         rescue Exception => e
@@ -52,8 +55,7 @@ class Project < Github
       board.each do |column, cards|
         cards.each do |card|                        
             opened_on = Date.parse(card['created_at'].to_s).iso8601
-            updated_on = Date.parse(card['updated_at'].to_s).iso8601                    
-
+            updated_on = Date.parse(card['updated_at'].to_s).iso8601            
             
             if column.upcase.eql? 'TO DO' 
                 if !kanban.has_key? opened_on                
@@ -64,8 +66,7 @@ class Project < Github
                     kanban[opened_on]['TO DO'] = 1
                 else 
                     kanban[opened_on]['TO DO'] += 1
-                end
-
+                end            
             else
                 if !kanban.has_key? updated_on                
                     kanban[updated_on] = Hash.new()
