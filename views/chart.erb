@@ -10,7 +10,7 @@
         <% if @type=="ComboChart" %>
         var options = {
           title: '',
-          hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}, showTextEvery: 2},
+          hAxis: {title: 'Time',  direction:-1, slantedText:true, slantedTextAngle:90, titleTextStyle: {color: '#333'}, showTextEvery: 10},
           vAxis: {title: 'Tasks', minValue: 0},
           seriesType: 'bars',
           series: {1: {type: 'line'}}
@@ -23,7 +23,7 @@
         var options = {
           isStacked: <%= @stacked %>,
           title: '',
-          hAxis: {title: 'Time',  titleTextStyle: {color: '#333'}, showTextEvery: 2},
+          hAxis: {title: 'Time',  direction:-1, slantedText:true, slantedTextAngle:90, titleTextStyle: {color: '#333'}, showTextEvery: 20},
           vAxis: {title: 'Tasks', minValue: 0},
         };
 

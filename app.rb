@@ -25,9 +25,7 @@ class App < Sinatra::Base
 
   get '/summary' do
     $ROUTE = request.path_info 
-    xmas_holidays = 10
     today = Date.today
-    target_delivery_date = Date.parse("14/02/2019")
     @cumulative_data = getCumulativeFlowData   
     @title = CONFIG['TITLE']
     @type = 'AreaChart'
@@ -37,16 +35,12 @@ class App < Sinatra::Base
     data = getThroughputData
     throughput = data.last.last
     @throughput = data.last.last.round(2)    
-    @work_days_remaining = -xmas_holidays + (Date.today..target_delivery_date).count {|d| (1..5).include?(d.wday)}    
-    required_throughput = @open_tickets.to_f / @work_days_remaining
     work_days_required = throughput * @open_tickets    
     days_required = (work_days_required + (work_days_required*2/7)).round
-    projected_delivery_date = today + days_required + xmas_holidays
+    projected_delivery_date = today + days_required
     @work_days_required = (work_days_required).round
     @projected_delivery_date = projected_delivery_date.iso8601
-    @target_delivery_date = target_delivery_date.iso8601
-    @required_throughput = required_throughput.round(2)
-    @warn = projected_delivery_date > target_delivery_date
+
     @colors = CONFIG['COLORS']
     
     erb :index

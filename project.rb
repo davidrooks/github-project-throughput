@@ -24,23 +24,22 @@ class Project < Github
             columns = JSON.parse(result)      
             
             columns.each do |col|   
-                cards = []                      
+                cards = []              
                 result = RestClient.get col['cards_url'], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']                
-                cards += JSON.parse(result)
+                cards += JSON.parse(result)                
                 while hasNextPage(result.headers[:link])                
-                    result = result = RestClient.get result.headers[:link].split(';')[0][1...-1], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
-                    cards += JSON.parse(result)
+                    result = RestClient.get getNextPage(result.headers[:link]), :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
+                    cards += JSON.parse(result)                                        
                 end       
-                board[col['name']] = cards     
-                @logger.debug "cards for column #{col['name']}"
-                @logger.debug cards.to_json
+                board[col['name']] = cards                     
+                @logger.debug "#{cards.length} cards in #{col['name']} column"
             end        
                     
         rescue Exception => e
             @logger.debug '-----------------------'
             @logger.debug  'exception!'
             @logger.debug e.to_s
-            @logger.debug e.backtrace
+            @logger.debug e.backtrace            
             @logger.debug '-----------------------'
         end
         $BOARD = board
@@ -79,7 +78,7 @@ class Project < Github
             end 
         end
       end    
-    
+      puts 'transformed data'
       @logger.info '=============================================='
       @logger.info 'Current ticket state...'
       @logger.info kanban.to_s

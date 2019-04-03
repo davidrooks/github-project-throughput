@@ -33,17 +33,13 @@
             <div class="row d-flex justify-content-between">
 
                 <div class="d-flex col">
-                    <div class="card w-100 text-white <%= @warn ? "bg-flat-color-4" : "bg-flat-color-5" %>">
+                    <div class="card w-100 text-white <%= @warn ? "bg-flat-color-1" : "bg-flat-color-1" %>">
                         <div class="card-body pb-0">  
                             <div class="stat-widget-one">
                                 <div class="stat-icon dib">
                                     <i class="ti-calendar"></i>        
                                 </div>  
-                                <div class="stat-content dib">
-                                    <h4 class="mb-0">
-                                        <span class="date"><%= @target_delivery_date %></span>
-                                    </h4>
-                                    <p class="text-light">Target Delivery Date</p>   
+                                <div class="stat-content dib">                                    
                                     <h4 class="mb-0">
                                         <span class="date"><%= @projected_delivery_date %></span>
                                     </h4>
@@ -56,18 +52,13 @@
                 <!--/.col-->
 
                 <div class="d-flex col">
-                    <div class="card w-100 text-white <%= @work_days_remaining < @work_days_required ? "bg-flat-color-4" : "bg-flat-color-5" %>">
+                    <div class="card w-100 text-white bg-flat-color-1"">
                         <div class="card-body pb-0">
                             <div class="stat-widget-one">
                                 <div class="stat-icon dib">
                                     <i class="ti-alarm-clock"></i>        
                                 </div>  
-                                <div class="stat-content dib">
-                                    <h4 class="mb-0">
-                                        <span class="count"><%= @work_days_remaining %></span>
-                                        <p class="text-light">Work Days Remaining</p>       
-                                    </h4>    
-                                    <h4 class="mb-0">
+                                <div class="stat-content dib">                                    
                                     <span class="count"><%= @work_days_required %></span>
                                     <p class="text-light">Work Days Required</p>       
                                     <p class="text-light">(based on current throughput)</p>  
@@ -103,19 +94,12 @@
                 <!--/.col-->           
 
                 <div class="d-flex col">
-                    <div class="card w-100 text-white <%= @required_throughput > @throughput ? "bg-flat-color-4" : "bg-flat-color-5" %>">
+                    <div class="card w-100 text-white bg-flat-color-1">
                         <div class="card-body">                        
-                            <div class="stat-widget-one">
-                                <div class="stat-icon dib">
-                                    <i class="<%= @required_throughput < @throughput ? "ti-stats-up" : "ti-stats-down" %>"></i>    
-                                </div>
+                            <div class="stat-widget-one">                               
                                 <div class="stat-content dib">
                                     <span class="count"><%= @throughput %></span>
                                     <p class="text-light">Current throughput</br>(tickets per day)</p>    
-                                    <h4 class="mb-0">
-                                        <span class="count"><%= @required_throughput %></span>
-                                    </h4>
-                                    <p class="text-light">Required throughput</br>(to achieve delivery)</p>   
                                 </div>
                             </div>
                                                  
