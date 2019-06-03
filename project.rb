@@ -26,8 +26,7 @@ class Project < Github
 
             columns.each do |col|
                 cards = []
-                print("\nCard URL: ")
-                print(col['cards_url'])
+
                 result = RestClient.get col['cards_url'], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
                 cards += JSON.parse(result)
                 while hasNextPage(result.headers[:link])

@@ -6,14 +6,19 @@ require 'sinatra/base'
 require 'tilt/erb'
 require './project.rb'
 require 'yaml'
+require './github.rb'
 require 'date'
 
 class App < Sinatra::Base
-    CONFIG = YAML.load_file('./config.yml')
+    # CONFIG = YAML.load_file('./config.yml')
+    config_file = File.open('./config.json')
+    CONFIG = JSON.load config_file
+
     PROJECT = Project.new()
     PROJECT.getProjectData()
     $PROJECT_DATA = PROJECT.transformData()
     # $PROJECT_DATA = {"2018-10-15"=>{"TO DO"=>8, "DONE"=>3}, "2018-10-29"=>{"TO DO"=>3, "BLOCKED"=>3, "READY FOR DEV"=>1, "IN DEVELOPMENT"=>1, "IN TEST"=>1, "FUNCTIONAL TEST AUTOMATION"=>1}, "2018-10-19"=>{"TO DO"=>1, "READY FOR DESIGN"=>1, "READY FOR DEV"=>8}, "2018-10-17"=>{"TO DO"=>1, "READY FOR DEV"=>8, "IN DEVELOPMENT"=>2, "DONE"=>1}, "2018-10-23"=>{"BLOCKED"=>8}, "2018-10-24"=>{"BLOCKED"=>1, "DONE"=>1}, "2018-10-18"=>{"READY FOR DESIGN"=>2, "READY FOR DEV"=>1}, "2018-10-31"=>{"IN DESIGN"=>1, "READY FOR DEV"=>3, "IN DEVELOPMENT"=>1, "IN REVIEW"=>2, "DONE"=>1}, "2018-10-30"=>{"READY FOR DEV"=>3, "IN DEVELOPMENT"=>1, "IN REVIEW"=>1, "DONE"=>4}, "2018-11-01"=>{"READY FOR DEV"=>1, "FUNCTIONAL TEST AUTOMATION"=>1, "DONE"=>1}, "2018-10-26"=>{"READY FOR DEV"=>11, "IN TEST"=>1, "DONE"=>4}, "2018-10-22"=>{"READY FOR DEV"=>2, "IN DEVELOPMENT"=>3}, "2018-10-16"=>{"IN DEVELOPMENT"=>1, "DONE"=>1}}
+
     $ROUTE = '/'
 
     def active_page?(path='')
@@ -57,7 +62,6 @@ class App < Sinatra::Base
         data
     end
 
-
     get '/summary' do
         $ROUTE = request.path_info
         today = Date.today
@@ -97,6 +101,18 @@ class App < Sinatra::Base
         erb :chart
     end
 
+    get '/api/throughput' do
+        content_type :json
+        $ROUTE = request.path_info
+        @data  = getThroughputData
+        @getThroughputDataJson  = getThroughputDataJson
+        @stacked = false
+        @title = 'Throughput'
+        @type = 'ComboChart'
+        data = {getThroughputDataJson: @getThroughputDataJson, throughputData: @data, title: @title, type: @type, stacked: @stacked}.to_json
+        data
+    end
+
     get '/throughput' do
         $ROUTE = request.path_info
         @data  = getThroughputData
@@ -106,10 +122,32 @@ class App < Sinatra::Base
         erb :chart
     end
 
+    def getThroughputDataJson()
+        dataJson = getDataJson(['TIME'].concat(CONFIG['THROUGHPUT_MAP']))
+        dataJson.each_with_index do |d,i|
+            puts "\n d: "
+            puts d['done']
+            puts "\n"
+            # avg = dataJson[1..i].map {|row| row[1]}.inject(:+).to_f / (i)
+            dataJson[1..i].map do |row|
+
+            end
+            # avg = dataJson[1..i].map {|row| row["done"]}.inject(:+).to_f / (i)
+            # puts avg
+
+            if i == 0
+                # dataJson[i][2] = 'AVERAGE'
+            else
+                # d["average"] = avg
+            end
+        end
+        dataJson
+    end
+
     def getThroughputData()
         data = getData(['TIME'].concat(CONFIG['THROUGHPUT_MAP']))
         data.each_with_index do |d,i|
-            avg = data[1..i].map {|row| row[1]}.inject(:+).to_f / (i)
+            avg = data[1..i].map {|row| row[1][0]}.inject(:+).to_f / (i)
             if i == 0
                 data[i][2] = 'AVERAGE'
             else
@@ -137,10 +175,32 @@ class App < Sinatra::Base
         data
     end
 
+    def getDataJson(format)
+        response = []
+        min_date = Date.parse($PROJECT_DATA.keys.sort.first)
+        max_date = Date.today
+
+        min_date.upto(max_date) do |d|
+            if d.saturday? || d.sunday?
+                next
+            end
+
+            current = {}
+            format.each_with_index do |key, index|
+                if $PROJECT_DATA.has_key? d.iso8601
+                    current = {"date": d.iso8601, "done": $PROJECT_DATA[d.iso8601][key] || 0}
+                else
+                    current = {"date": d.iso8601, "done": 0}
+                end
+            end
+            response << current
+        end
+        response
+    end
+
     def getData(format)
         response = []
         response << format
-
         min_date = Date.parse($PROJECT_DATA.keys.sort.first)
         max_date = Date.today
 
@@ -163,8 +223,6 @@ class App < Sinatra::Base
             end
             response << current
         end
-        # print(">>><<<")
-        # print(response)
         return response
     end
 end

@@ -10,8 +10,10 @@ class Github
     GITHUB_API = 'https://api.github.com'
 
     def initialize
-        @logger = Logger.new('logs.log', 'monthly')
+        # @logger = Logger.new('logs.log', 'monthly')
+        @logger = Logger.new(STDOUT)
         @logger.level = CONFIG['LOG_LEVEL'] || Logger::DEBUG
+
         RestClient.log = @logger
     end
 
