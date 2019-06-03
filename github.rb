@@ -1,33 +1,34 @@
+# Language: Ruby, Level: Level 3
 require 'json'
 require 'time'
 require 'rest-client'
 require 'logger'
 require 'yaml'
 
-class Github 
-    CONFIG = YAML.load_file('./config.yml')     
-    GITHUB_API = 'https://api.github.com'     
-    
-    def initialize    
+class Github
+    CONFIG = YAML.load_file('./config.yml')
+    GITHUB_API = 'https://api.github.com'
+
+    def initialize
         @logger = Logger.new('logs.log', 'monthly')
         @logger.level = CONFIG['LOG_LEVEL'] || Logger::DEBUG
         RestClient.log = @logger
-    end 
-  
-  
+    end
+
+
     def hasNextPage link
-      if link.nil? 
+      if link.nil?
         return false
-      else 
+      else
         return link.include? 'next'
       end
-    end    
+    end
 
-    def getNextPage link 
+    def getNextPage link
       return parseLinkHeader(link)[:next]
-    end 
+    end
 
-    def parseLinkHeader link 
+    def parseLinkHeader link
       links = Hash.new
       parts = link.split(',')
       parts.each do |part, index|
@@ -36,7 +37,7 @@ class Github
         name = section[1][/rel="(.*)"/,1].to_sym
         links[name] = url
       end
-      
-      return links      
-    end 
+
+      return links
+    end
 end

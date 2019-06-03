@@ -1,8 +1,8 @@
 # Github Project Charts
 
-Provides several charts to give you varying views of your github project. 
+Provides several charts to give you varying views of your github project.
 
-This is a handy tool for checking out team velocity, throughput, wip, cycle time etc. 
+This is a handy tool for checking out team velocity, throughput, wip, cycle time etc.
 
 # Getting started
 
@@ -18,12 +18,19 @@ This is a handy tool for checking out team velocity, throughput, wip, cycle time
 # Project settings
 
 1. REQUIRED: OAUTH - the oauth token of your github repo
-2. REQUIRED: GITHUB_PROJECT - the path to your project 
+2. REQUIRED: GITHUB_PROJECT - the path to your project
 3. REQUIRED: REPO - the path to your github repo
 4. REQUIRED: THROUGHPUT_MAP - the names of the columns you want displayed on this chart. NOTE: throughput is calculated based on combined average of these columns.
-5. REQUIRED: CUMULATIVE_MAP  - the names of the columns you want displayed on this chart. 
+5. REQUIRED: CUMULATIVE_MAP  - the names of the columns you want displayed on this chart.
 6. OPTIONAL: COLORS - the colours you want to use to represent each column in the cumulative flow chart
 7. OPTIONAL: LOG_LEVEL - debug, info, warn, error, fatal
 8. OPTIONAL: TITLE - the title of the website
 
-
+# To fetch the project Id
+```
+curl -X GET \
+  https://api.github.com/repos/sky-uk/nowtv-feature-squads/projects \
+  -H 'Accept: application/vnd.github.inertia-preview+json' \
+  -H 'Authorization: token <TOKEN>' \
+  -H 'cache-control: no-cache'
+  ```

@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title><%= @title %></title>
-    
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="assets/css/normalize.css">
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="assets/css/themify-icons.css">
     <link rel="stylesheet" href="assets/css/flag-icon.min.css">
     <link rel="stylesheet" href="assets/css/cs-skin-elastic.css">
-    <link rel="stylesheet" href="assets/scss/style.css">    
+    <link rel="stylesheet" href="assets/scss/style.css">
 </head>
 <body>
 
@@ -23,30 +23,30 @@
             <div class="header-menu">
                 <div class="col-sm-7">
                     <div class="header-left">
-                        <a class="refresh" href="/refresh"><i class="fa fa-refresh"></i></a>                        
+                        <a class="refresh" href="/refresh"><i class="fa fa-refresh"></i></a>
                     </div>
-                </div>               
+                </div>
             </div>
         </header>
 
-        <div class="content">                
+        <div class="content">
             <div class="row d-flex justify-content-between">
 
                 <div class="d-flex col">
                     <div class="card w-100 text-white <%= @warn ? "bg-flat-color-1" : "bg-flat-color-1" %>">
-                        <div class="card-body pb-0">  
+                        <div class="card-body pb-0">
                             <div class="stat-widget-one">
                                 <div class="stat-icon dib">
-                                    <i class="ti-calendar"></i>        
-                                </div>  
-                                <div class="stat-content dib">                                    
+                                    <i class="ti-calendar"></i>
+                                </div>
+                                <div class="stat-content dib">
                                     <h4 class="mb-0">
                                         <span class="date"><%= @projected_delivery_date %></span>
                                     </h4>
-                                    <p class="text-light">Projected delivery date</br>(based on current throughput)</p>    
+                                    <p class="text-light">Projected delivery date<br />(based on current throughput)</p>
                                 </div>
                             </div>
-                        </div>  
+                        </div>
                     </div>
                 </div>
                 <!--/.col-->
@@ -56,53 +56,66 @@
                         <div class="card-body pb-0">
                             <div class="stat-widget-one">
                                 <div class="stat-icon dib">
-                                    <i class="ti-alarm-clock"></i>        
-                                </div>  
-                                <div class="stat-content dib">                                    
-                                    <span class="count"><%= @work_days_required %></span>
-                                    <p class="text-light">Work Days Required</p>       
-                                    <p class="text-light">(based on current throughput)</p>  
-                                </h4>  
+                                    <i class="ti-alarm-clock"></i>
                                 </div>
-                            </div>                                                                                          
+                                <div class="stat-content dib">
+                                    <span class="count"><%= @work_days_required %></span>
+                                    <p class="text-light">Work Days Required</p>
+                                    <p class="text-light">(based on current throughput)</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!--/.col-->            
+                <!--/.col-->
 
                 <div class="d-flex col">
                     <div class="card w-100 text-white bg-flat-color-1">
-                        <div class="card-body pb-0">  
+                        <div class="card-body pb-0">
                             <div class="stat-widget-one">
                                 <div class="stat-icon dib">
-                                    <i class="ti-github"></i>        
-                                </div>  
+                                    <i class="ti-github"></i>
+                                </div>
                                 <div class="stat-content dib">
                                     <h4 class="mb-0">
                                         <span class="count"><%= @closed_tickets %></span>
-                                        <p class="text-light">Done tickets</p>   
+                                        <p class="text-light">Done tickets</p>
                                     </h4>
                                     <h4 class="mb-0">
                                         <span class="count"><%= @open_tickets %></span>
-                                        <p class="text-light">Open tickets</p>      
-                                    </h4>      
+                                        <p class="text-light">Open tickets</p>
+                                    </h4>
                                 </div>
-                            </div>                                                                                     
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!--/.col-->           
+                <!--/.col-->
 
                 <div class="d-flex col">
                     <div class="card w-100 text-white bg-flat-color-1">
-                        <div class="card-body">                        
-                            <div class="stat-widget-one">                               
+                        <div class="card-body">
+                            <div class="stat-widget-one">
                                 <div class="stat-content dib">
                                     <span class="count"><%= @throughput %></span>
-                                    <p class="text-light">Current throughput</br>(tickets per day)</p>    
+                                    <p class="text-light">Current throughput<br />(tickets per day)</p>
                                 </div>
                             </div>
-                                                 
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex col">
+                    <div class="card w-100 text-white bg-flat-color-1">
+                        <div class="card-body">
+                            <div class="stat-widget-one">
+                                <div class="stat-content dib">
+                                    <span class="count"><%= @throughput %></span>
+                                    <p class="text-light">New throughput<br />(tickets per day)</p>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -117,23 +130,21 @@
                             <div class="d-flex justify-content-center bg-white pt-3">
                                 <ul class="row d-flex justify-content-between list-inline">
                                     <% @cumulative_data[0][1..-1].each_with_index do |data, index| %>
-                                        <li class="col-sm">                                        
-                                            <div class="text-muted text-center"><%= data %></div>
-                                            <div class="flex-d text-center"><%= @cumulative_data.last[index+1] %></div>                                    
-                                            <div class="progress progress-xs mt-2" style="height: 5px;">
-                                                <div class="progress-bar" role="progressbar" style="width: 100%; background-color: <%= @colors[index] %>" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </li>
+                                    <li class="col-sm">
+                                        <div class="text-muted text-center"><%= data %></div>
+                                        <div class="flex-d text-center"><%= @cumulative_data.last[index+1] %></div>
+                                        <div class="progress progress-xs mt-2" style="height: 5px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 100%; background-color: <%= @colors[index] %>" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </li>
                                     <% end %>
                                 </ul>
                             </div>
-                            </div>
-                                <div class="container-fluid" id="chart_div" style="height: 800px;"></div>                        
-                            </div>                        
                         </div>
+                        <div class="container-fluid" id="chart_div" style="height: 800px;"></div>
                     </div>
                 </div>
-            </div>    
+            </div>
         </div> <!-- .content -->
     </div><!-- /#right-panel -->
 
@@ -142,26 +153,26 @@
     <script src="assets/js/vendor/jquery-2.1.4.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable(<%= @cumulative_data %>);
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+        function drawChart() {
+            var data = google.visualization.arrayToDataTable(<%= @cumulative_data %>);
 
-        var options = {
-          isStacked: <%= @stacked %>,
-          title: '',          
-          legend: {position: 'none'},
-          colors: <%= @colors %>,
-          chartArea: {top: '1%', 'width': '100%', 'height': '80%'},
-          hAxis: {title: '',  titleTextStyle: {color: '#333'}, showTextEvery: 2},
-          vAxis: {title: 'Tickets', minValue: 0},
-        };
+            var options = {
+                isStacked: <%= @stacked %>,
+                title: '',
+                legend: {position: 'none'},
+                colors: <%= @colors %>,
+                chartArea: {top: '1%', 'width': '100%', 'height': '80%'},
+                hAxis: {title: '',  titleTextStyle: {color: '#333'}, showTextEvery: 2},
+                vAxis: {title: 'Tickets', minValue: 0},
+            };
 
 
-        var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+            var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
 
-        chart.draw(data, options);
-      }
+            chart.draw(data, options);
+        }
     </script>
 </body>
 </html>

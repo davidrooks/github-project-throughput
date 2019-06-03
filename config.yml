@@ -1,7 +1,66 @@
 OAUTH: ''
-LOG_LEVEL: 'debug'
-REPO: ''
-PROJECT: ''
+REPO: 'sky-uk/nowtv-feature-squads'
+PROJECT: '2571291'
+TITLE: 'Cubs team dashboard'
 THROUGHPUT_MAP: ['DONE']
-CUMULATIVE_MAP: ['DONE', 'BLOCKED', 'IN PROGRESS', 'TO DO']
-COLORS: []
+CUMULATIVE_MAP: ['DONE', 'IN QA', 'READY FOR QA', 'BLOCKED', 'CODE REVIEW', 'IN PROGRESS', 'SPRINT BACKLOG', 'PRODUCT BACKLOG']
+COLORS: ['#2ea34d', '#2ea36b', '#6cbe82', '#abdab7', '#dfdeea', '#b1adcb', '#918cb6']
+COLUMNS: [{
+        name: 'ANALYSIS',
+        color: '#918cb6',
+        sprintReport: true,
+        explanationField: true,
+        storePoints: true
+    },{
+        name: 'PRODUCT BACKLOG',
+        color: '#918cb6',
+        sprintReport: true,
+        explanationField: true,
+        storePoints: true
+    },{
+        name: 'SPRINT BACKLOG',
+        color: '#918cb6',
+        sprintReport: true,
+        explanationField: true,
+        storePoints: true
+    },{
+        name: 'IN PROGRESS',
+        color: '#b1adcb',
+        sprintReport: true,
+        explanationField: true,
+        storePoints: true
+    },{
+        name: 'CODE REVIEW',
+        color: '#dfdeea',
+        sprintReport: true,
+        explanationField: true,
+        storePoints: true
+
+    },{
+        name: 'BLOCKED',
+        color: '#abdab7',
+        sprintReport: true,
+        explanationField: true,
+        storePoints: true
+
+    },{
+        name: 'READY FOR QA',
+        color: '#6cbe82',
+        sprintReport: true,
+        explanationField: true,
+        storePoints: true
+
+    },{
+        name: 'IN QA',
+        color: '#2ea36b',
+        sprintReport: true,
+        explanationField: true,
+        storePoints: true
+
+    },{
+        name: 'DONE',
+        color: '#2ea34d',
+        sprintReport: true,
+        explanationField: true,
+        storePoints: true
+    }]
