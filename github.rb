@@ -6,7 +6,9 @@ require 'logger'
 require 'yaml'
 
 class Github
-    CONFIG = YAML.load_file('./config.yml')
+    config_file = File.open('./config.json')
+    CONFIG = JSON.load config_file
+
     GITHUB_API = 'https://api.github.com'
 
     def initialize
