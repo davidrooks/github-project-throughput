@@ -1,19 +1,22 @@
 # Language: Ruby, Level: Level 3
 require './github.rb'
+require './ConfigLoader.rb'
 
 class Project < Github
-    PROJECT_PATH = '/projects/' + CONFIG['PROJECT'] + '/columns'
-    PROJECTS_PATH = '/repos/' + CONFIG['REPO'] + '/projects'
-
-    $BOARD = Hash.new()
 
     def initialize
         super()
     end
+    $configLoader = ConfigLoader.new()
+    PROJECT_PATH = '/projects/' + $configLoader.getConfigValue('PROJECT') + '/columns'
+    PROJECTS_PATH = '/repos/' + $configLoader.getConfigValue('REPO') + '/projects'
+
+    $BOARD = Hash.new()
+
 
     #   can be used to find the ID of your github projects as this is not exposed by github website
     def getProjectID()
-        result = RestClient.get GITHUB_API + PROJECTS_PATH, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
+        result = RestClient.get GITHUB_API + PROJECTS_PATH, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + $configLoader.getConfigValue('OAUTH')
         result = JSON.parse(result)
     end
 
@@ -21,16 +24,16 @@ class Project < Github
         board = Hash.new()
         @logger.debug 'getting issues from ' + GITHUB_API
         begin
-            result = RestClient.get GITHUB_API + PROJECT_PATH, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
+            result = RestClient.get GITHUB_API + PROJECT_PATH, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + $configLoader.getConfigValue('OAUTH')
             columns = JSON.parse(result)
 
             columns.each do |col|
                 cards = []
 
-                result = RestClient.get col['cards_url'], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
+                result = RestClient.get col['cards_url'], :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + $configLoader.getConfigValue('OAUTH')
                 cards += JSON.parse(result)
                 while hasNextPage(result.headers[:link])
-                    result = RestClient.get getNextPage(result.headers[:link]), :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + CONFIG['OAUTH']
+                    result = RestClient.get getNextPage(result.headers[:link]), :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + $configLoader.getConfigValue('OAUTH')
                     cards += JSON.parse(result)
                 end
                 # print(cards)

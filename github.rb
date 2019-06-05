@@ -4,19 +4,13 @@ require 'time'
 require 'rest-client'
 require 'logger'
 require 'yaml'
+require './ConfigLoader.rb'
 
-class Github
-    config_file = File.open('./config.json')
-    CONFIG = JSON.load config_file
-
+class Github < ConfigLoader
     GITHUB_API = 'https://api.github.com'
 
     def initialize
-        # @logger = Logger.new('logs.log', 'monthly')
-        @logger = Logger.new(STDOUT)
-        @logger.level = CONFIG['LOG_LEVEL'] || Logger::DEBUG
-
-        RestClient.log = @logger
+        super()
     end
 
 

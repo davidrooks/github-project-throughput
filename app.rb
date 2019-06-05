@@ -7,14 +7,15 @@ require 'tilt/erb'
 require './project.rb'
 require 'yaml'
 require './github.rb'
+require './configLoader.rb'
 require 'date'
 
 class App < Sinatra::Base
-    # CONFIG = YAML.load_file('./config.yml')
-    config_file = File.open('./config.json')
-    CONFIG = JSON.load config_file
 
-    PROJECT = Project.new()
+    # config_file = File.open('./config.json')
+
+    $configLoader = ConfigLoader.new()
+    # PROJECT = Project.new()
     # PROJECT.getProjectData()
     # $PROJECT_DATA = PROJECT.transformData()
     $PROJECT_DATA = {"2019-05-09"=>{"INFORMATION"=>1, "DONE"=>1}, "2019-05-22"=>{"ANALYSIS"=>2}, "2019-05-23"=>{"ANALYSIS"=>3}, "2019-05-30"=>{"ANALYSIS"=>2, "PRODUCT BACKLOG"=>1, "CODE REVIEW"=>1, "BLOCKED"=>3, "DONE"=>1}, "2019-05-24"=>{"ANALYSIS"=>2, "BLOCKED"=>1, "DONE"=>1}, "2019-06-03"=>{"ANALYSIS"=>2, "IN PROGRESS"=>2, "READY FOR QA"=>1, "IN QA"=>2}, "2019-05-31"=>{"ANALYSIS"=>1, "PRODUCT BACKLOG"=>3, "CODE REVIEW"=>2, "READY FOR QA"=>1, "DONE"=>4}, "2019-05-29"=>{"PRODUCT BACKLOG"=>3, "SPRINT BACKLOG"=>3, "CODE REVIEW"=>1, "READY FOR QA"=>2, "IN QA"=>1, "DONE"=>1}, "2019-05-28"=>{"IN PROGRESS"=>1, "READY FOR QA"=>1, "DONE"=>3}, "2019-05-20"=>{"IN PROGRESS"=>1, "DONE"=>2}, "2019-05-21"=>{"CODE REVIEW"=>1, "BLOCKED"=>2, "DONE"=>1}, "2019-05-08"=>{"BLOCKED"=>1}, "2019-05-14"=>{"BLOCKED"=>3}, "2019-05-16"=>{"DONE"=>3}, "2019-05-15"=>{"DONE"=>2}, "2019-05-13"=>{"DONE"=>1}}
@@ -40,7 +41,7 @@ class App < Sinatra::Base
         today = Date.today
         @cumulative_data = getCumulativeFlowData
 
-        @title = CONFIG['TITLE']
+        @title = $configLoader.getConfigValue('TITLE')
         @type = 'AreaChart'
         @stacked = true
         @open_tickets = @cumulative_data.last[2..-1].sum
@@ -54,18 +55,7 @@ class App < Sinatra::Base
         @work_days_required = (work_days_required).round
         @projected_delivery_date = projected_delivery_date.iso8601
 
-        @colors = CONFIG['COLORS']
-
-
-        # hashview = params['hashview']
-        #
-        # if (hashview == 'true')
-        #     puts "HASHVIEW"
-        #     @data = getDataJson(CONFIG['THROUGHPUT_MAP'])
-        # else
-        #     puts "HASHVIEW NOT!"
-        #     @data  = getThroughputData
-        # end
+        @colors = $configLoader.getConfigValue('COLORS')
 
         data = { cumulative_data: @cumulative_data, title: @title, type: @type, stacked: @stacked, open_tickets: @open_tickets, closed_tickets: @closed_tickets, throughput: @throughput, work_days_required: @work_days_required, projected_delivery_date: @projected_delivery_date, colors: @colors}.to_json
 
@@ -77,7 +67,7 @@ class App < Sinatra::Base
         today = Date.today
         @cumulative_data = getCumulativeFlowData
         # print(@cumulative_data)
-        @title = CONFIG['TITLE']
+        @title = $configLoader.getConfigValue('TITLE')
         @type = 'AreaChart'
         @stacked = true
         @open_tickets = @cumulative_data.last[2..-1].sum
@@ -91,7 +81,7 @@ class App < Sinatra::Base
         @work_days_required = (work_days_required).round
         @projected_delivery_date = projected_delivery_date.iso8601
 
-        @colors = CONFIG['COLORS']
+        @colors = $configLoader.getConfigValue('COLORS')
 
         erb :index
     end
@@ -120,14 +110,23 @@ class App < Sinatra::Base
 
         hashview = params['hashview']
         if (hashview == 'true')
-            puts "HASHVIEW"
-            @data = getDataJson(CONFIG['CUMULATIVE_MAP'])
+            jsonData = getDataJson($configLoader.getConfigValue('CUMULATIVE_MAP'))
+            previousResult = {:DATE=>"2019-05-08", "DONE"=>0, "IN QA"=>0, "READY FOR QA"=>0, "BLOCKED"=>0, "CODE REVIEW"=>0, "IN PROGRESS"=>0, "SPRINT BACKLOG"=>0, "PRODUCT BACKLOG"=>0}
+
+            $configLoader.getConfigValue('CUMULATIVE_MAP').each_with_index do |column, j|
+                jsonData.each_with_index do |d, i|
+                    if d[column].class == Integer
+                        d[column] = d[column] + previousResult[column]
+                    end
+                    previousResult = d
+                end
+            end
+            @data = jsonData
         else
-            puts "HASHVIEW NOT!"
             @data  = getCumulativeFlowData
         end
 
-        {throughputData: @data, title: @title, type: @type, stacked: @stacked}.to_json
+        {title: @title, type: @type, stacked: @stacked, throughputData: @data}.to_json
     end
 
     get '/api/throughput' do
@@ -140,10 +139,8 @@ class App < Sinatra::Base
         hashview = params['hashview']
 
         if (hashview == 'true')
-            puts "HASHVIEW"
-            @data = getDataJson(CONFIG['THROUGHPUT_MAP'])
+            @data = getDataJson($configLoader.getConfigValue('THROUGHPUT_MAP'))
         else
-            puts "HASHVIEW NOT!"
             @data  = getThroughputData
         end
         {title: @title, type: @type, stacked: @stacked, throughputData: @data}.to_json
@@ -151,6 +148,7 @@ class App < Sinatra::Base
 
     get '/throughput' do
         $ROUTE = request.path_info
+        puts getThroughputData
         @data  = getThroughputData
         @stacked = false
         @title = 'Throughput'
@@ -159,17 +157,16 @@ class App < Sinatra::Base
     end
 
     def getThroughputData()
-        dataJson = getDataJson(CONFIG['THROUGHPUT_MAP'])
+        dataJson = getDataJson($configLoader.getConfigValue('THROUGHPUT_MAP'))
         current = []
 
         total_done = 0
         dataJson.each_with_index do |d,i|
-            # puts d
             total_done = d["DONE"] + total_done
 
             d["average"] = total_done.to_f/(i+1)
             response = []
-            response[0] = d[:date]
+            response[0] = d[:DATE]
             response[1] = d["DONE"]
             response[2] = total_done.to_f/(i+1)
             current << response
@@ -178,24 +175,9 @@ class App < Sinatra::Base
         [header].concat(current)
     end
 
-    # def getThroughputData()
-    #     data = getData(['TIME'].concat(CONFIG['THROUGHPUT_MAP']))
-    #     data.each_with_index do |d,i|
-    #         avg = data[1..i].map {|row| row[1][0]}.inject(:+).to_f / (i)
-    #         if i == 0
-    #             data[i][2] = 'AVERAGE'
-    #         else
-    #             data[i][2] = avg
-    #         end
-    #     end
-    #
-    #     return data
-    # end
 
     def getCumulativeFlowData()
-        # todo: make it same as getThroughputData
-        data = getData(['TIME'].concat(CONFIG['CUMULATIVE_MAP']))
-
+        data = getData(['TIME'].concat($configLoader.getConfigValue('CUMULATIVE_MAP')))
         data.each_with_index do |d, i|
             if i <= 1
                 next
@@ -219,10 +201,9 @@ class App < Sinatra::Base
             if d.saturday? || d.sunday?
                 next
             end
-            puts d
             current = {}
             format.each_with_index do |key, index|
-                current = {date: d.iso8601}
+                current = {"DATE": d.iso8601}
                 if $PROJECT_DATA.has_key? d.iso8601
                     format.each_with_index do |k, i|
                         current[format[i]] = $PROJECT_DATA[d.iso8601][format[i]] || 0
@@ -241,6 +222,7 @@ class App < Sinatra::Base
     def getData(format)
         response = []
         response << format
+        puts $PROJECT_DATA
         min_date = Date.parse($PROJECT_DATA.keys.sort.first)
         max_date = Date.today
 
