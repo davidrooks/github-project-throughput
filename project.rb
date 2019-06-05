@@ -64,6 +64,10 @@ class Project < Github
         #
     end
 
+    def getBoard()
+        return $BOARD
+    end
+
     def estimatedSizeInColumns()
         # Aim is to take the label "Estimate 2" and add them
         # Also to fetch other type of cards and add them

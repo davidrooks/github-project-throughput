@@ -15,10 +15,11 @@ class App < Sinatra::Base
     # config_file = File.open('./config.json')
 
     $configLoader = ConfigLoader.new()
-    # PROJECT = Project.new()
-    # PROJECT.getProjectData()
-    # $PROJECT_DATA = PROJECT.transformData()
-    $PROJECT_DATA = {"2019-05-09"=>{"INFORMATION"=>1, "DONE"=>1}, "2019-05-22"=>{"ANALYSIS"=>2}, "2019-05-23"=>{"ANALYSIS"=>3}, "2019-05-30"=>{"ANALYSIS"=>2, "PRODUCT BACKLOG"=>1, "CODE REVIEW"=>1, "BLOCKED"=>3, "DONE"=>1}, "2019-05-24"=>{"ANALYSIS"=>2, "BLOCKED"=>1, "DONE"=>1}, "2019-06-03"=>{"ANALYSIS"=>2, "IN PROGRESS"=>2, "READY FOR QA"=>1, "IN QA"=>2}, "2019-05-31"=>{"ANALYSIS"=>1, "PRODUCT BACKLOG"=>3, "CODE REVIEW"=>2, "READY FOR QA"=>1, "DONE"=>4}, "2019-05-29"=>{"PRODUCT BACKLOG"=>3, "SPRINT BACKLOG"=>3, "CODE REVIEW"=>1, "READY FOR QA"=>2, "IN QA"=>1, "DONE"=>1}, "2019-05-28"=>{"IN PROGRESS"=>1, "READY FOR QA"=>1, "DONE"=>3}, "2019-05-20"=>{"IN PROGRESS"=>1, "DONE"=>2}, "2019-05-21"=>{"CODE REVIEW"=>1, "BLOCKED"=>2, "DONE"=>1}, "2019-05-08"=>{"BLOCKED"=>1}, "2019-05-14"=>{"BLOCKED"=>3}, "2019-05-16"=>{"DONE"=>3}, "2019-05-15"=>{"DONE"=>2}, "2019-05-13"=>{"DONE"=>1}}
+    PROJECT = Project.new()
+    PROJECT.getProjectData()
+    $PROJECT_DATA = PROJECT.transformData()
+    $PROJECT_BOARD = PROJECT.getBoard()
+    # $PROJECT_DATA = {"2019-05-09"=>{"INFORMATION"=>1, "DONE"=>1}, "2019-05-22"=>{"ANALYSIS"=>2}, "2019-05-23"=>{"ANALYSIS"=>3}, "2019-05-30"=>{"ANALYSIS"=>2, "PRODUCT BACKLOG"=>1, "CODE REVIEW"=>1, "BLOCKED"=>3, "DONE"=>1}, "2019-05-24"=>{"ANALYSIS"=>2, "BLOCKED"=>1, "DONE"=>1}, "2019-06-03"=>{"ANALYSIS"=>2, "IN PROGRESS"=>2, "READY FOR QA"=>1, "IN QA"=>2}, "2019-05-31"=>{"ANALYSIS"=>1, "PRODUCT BACKLOG"=>3, "CODE REVIEW"=>2, "READY FOR QA"=>1, "DONE"=>4}, "2019-05-29"=>{"PRODUCT BACKLOG"=>3, "SPRINT BACKLOG"=>3, "CODE REVIEW"=>1, "READY FOR QA"=>2, "IN QA"=>1, "DONE"=>1}, "2019-05-28"=>{"IN PROGRESS"=>1, "READY FOR QA"=>1, "DONE"=>3}, "2019-05-20"=>{"IN PROGRESS"=>1, "DONE"=>2}, "2019-05-21"=>{"CODE REVIEW"=>1, "BLOCKED"=>2, "DONE"=>1}, "2019-05-08"=>{"BLOCKED"=>1}, "2019-05-14"=>{"BLOCKED"=>3}, "2019-05-16"=>{"DONE"=>3}, "2019-05-15"=>{"DONE"=>2}, "2019-05-13"=>{"DONE"=>1}}
 
     $ROUTE = '/'
 
@@ -55,7 +56,7 @@ class App < Sinatra::Base
         @work_days_required = (work_days_required).round
         @projected_delivery_date = projected_delivery_date.iso8601
 
-        @colors = $configLoader.getConfigValue('COLORS')
+        @colors = $configLoader.getAllColors
 
         data = { cumulative_data: @cumulative_data, title: @title, type: @type, stacked: @stacked, open_tickets: @open_tickets, closed_tickets: @closed_tickets, throughput: @throughput, work_days_required: @work_days_required, projected_delivery_date: @projected_delivery_date, colors: @colors}.to_json
 
@@ -81,7 +82,7 @@ class App < Sinatra::Base
         @work_days_required = (work_days_required).round
         @projected_delivery_date = projected_delivery_date.iso8601
 
-        @colors = $configLoader.getConfigValue('COLORS')
+        @colors = $configLoader.getAllColors
 
         erb :index
     end
@@ -101,6 +102,14 @@ class App < Sinatra::Base
         erb :chart
     end
 
+    get '/api/board' do
+        content_type :json
+        $ROUTE = request.path_info
+        $PROJECT_BOARD.to_json
+    end
+    # go through all http://localhost:9292/api/board in content_url
+    # from which go through the labels and save them
+
     get '/api/cumulative-flow-diagram' do
         content_type :json
         $ROUTE = request.path_info
@@ -110,10 +119,10 @@ class App < Sinatra::Base
 
         hashview = params['hashview']
         if (hashview == 'true')
-            jsonData = getDataJson($configLoader.getConfigValue('CUMULATIVE_MAP'))
-            previousResult = {:DATE=>"2019-05-08", "DONE"=>0, "IN QA"=>0, "READY FOR QA"=>0, "BLOCKED"=>0, "CODE REVIEW"=>0, "IN PROGRESS"=>0, "SPRINT BACKLOG"=>0, "PRODUCT BACKLOG"=>0}
+            jsonData = getDataJson($configLoader.getAllColumns)
+            previousResult = $configLoader.emptyBoardColumns
 
-            $configLoader.getConfigValue('CUMULATIVE_MAP').each_with_index do |column, j|
+            $configLoader.getAllColumns.each_with_index do |column, j|
                 jsonData.each_with_index do |d, i|
                     if d[column].class == Integer
                         d[column] = d[column] + previousResult[column]
@@ -139,7 +148,7 @@ class App < Sinatra::Base
         hashview = params['hashview']
 
         if (hashview == 'true')
-            @data = getDataJson($configLoader.getConfigValue('THROUGHPUT_MAP'))
+            @data = getDataJson($configLoader.getThroughputColumn)
         else
             @data  = getThroughputData
         end
@@ -148,7 +157,6 @@ class App < Sinatra::Base
 
     get '/throughput' do
         $ROUTE = request.path_info
-        puts getThroughputData
         @data  = getThroughputData
         @stacked = false
         @title = 'Throughput'
@@ -157,7 +165,7 @@ class App < Sinatra::Base
     end
 
     def getThroughputData()
-        dataJson = getDataJson($configLoader.getConfigValue('THROUGHPUT_MAP'))
+        dataJson = getDataJson($configLoader.getThroughputColumn)
         current = []
 
         total_done = 0
@@ -177,7 +185,7 @@ class App < Sinatra::Base
 
 
     def getCumulativeFlowData()
-        data = getData(['TIME'].concat($configLoader.getConfigValue('CUMULATIVE_MAP')))
+        data = getData(['TIME'].concat($configLoader.getAllColumns))
         data.each_with_index do |d, i|
             if i <= 1
                 next
@@ -222,7 +230,7 @@ class App < Sinatra::Base
     def getData(format)
         response = []
         response << format
-        puts $PROJECT_DATA
+
         min_date = Date.parse($PROJECT_DATA.keys.sort.first)
         max_date = Date.today
 

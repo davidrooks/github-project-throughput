@@ -24,4 +24,69 @@ class ConfigLoader
             return @loadedConfig[key]
         end
     end
+
+    def getAllColumns
+        allColumns = getConfigValue('COLUMNS')
+        result = []
+        allColumns.each_with_index do |column, i|
+            result << column['name']
+        end
+        result
+    end
+
+    def getAllColors
+        allColumns = getConfigValue('COLUMNS')
+        result = []
+        allColumns.each_with_index do |column, i|
+            result << column['color']
+        end
+        result
+    end
+
+    def getExplanationFieldColumns
+        allColumns = getConfigValue('COLUMNS')
+        result = []
+
+        allColumns.each_with_index do |column, i|
+            if column['sprintReport'] == true
+                result << column['name']
+            end
+        end
+        result
+    end
+
+    def getSprintReportColumns
+        allColumns = getConfigValue('COLUMNS')
+        result = []
+
+        allColumns.each_with_index do |column, i|
+            if column['sprintReport'] == true
+                result << column['name']
+            end
+        end
+        result
+    end
+
+    def getThroughputColumn
+        allColumns = getConfigValue('COLUMNS')
+        result = []
+
+        allColumns.each_with_index do |column, i|
+            if column['throughputMap'] == true
+                result << column['name']
+            end
+        end
+        result
+    end
+
+    def emptyBoardColumns
+        allColumns = getConfigValue('COLUMNS')
+        result = {}
+        allColumns.each_with_index do |column, i|
+            result[column['name']] = 0
+        end
+        result[:DATE] = "01/01/2019"
+
+        result
+    end
 end
