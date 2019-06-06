@@ -36,8 +36,7 @@ class Project < Github
                     result = RestClient.get getNextPage(result.headers[:link]), :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + $configLoader.getConfigValue('OAUTH')
                     cards += JSON.parse(result)
                 end
-                # print(cards)
-                board[col['name']] = cards
+                board[col['name'].upcase] = cards
                 @logger.info "#{cards.length} cards in #{col['name']} column"
             end
 
@@ -49,6 +48,31 @@ class Project < Github
             @logger.debug '-----------------------'
         end
         $BOARD = board
+    end
+
+    def fetchLabelsForAllIssues
+        kanban = Hash.new()
+
+        board = $BOARD
+        issue_labels = []
+        board.each do |column, cards|
+            # puts "cards #{cards}"
+            puts "column #{column}"
+            cards.each do |card|
+                if card.include?('content_url')
+                    issue_url = card['content_url']
+                    puts "issue_url #{issue_url}"
+                    result = RestClient.get issue_url, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + $configLoader.getConfigValue('OAUTH')
+                    issue = JSON.parse(result)
+                    puts "issue result #{issue}"
+                    if issue.include?('labels')
+                        issue_labels = issue.labels
+                        puts "?>>>>>>> issue_labels #{issue_labels}"
+                    end
+                end
+            end
+        end
+        issue_labels
     end
 
 

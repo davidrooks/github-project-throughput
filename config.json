@@ -5,69 +5,69 @@
 "TITLE": "Cubs team dashboard",
 "LOG_LEVEL": "DEBUG",
 "COLUMNS": [{
-        "name": "ANALYSIS",
+        "name": "Analysis",
         "color": "#918cb6",
-        "sprintReport": true,
+        "inSprint": false,
         "explanationField": true,
         "storePoints": true,
         "throughputMap": false
     },{
-        "name": "PRODUCT BACKLOG",
+        "name": "Product Backlog",
         "color": "#918cb6",
-        "sprintReport": true,
+        "inSprint": false,
         "explanationField": true,
         "storePoints": true,
         "throughputMap": false
     },{
-        "name": "SPRINT BACKLOG",
+        "name": "Sprint Backlog",
         "color": "#918cb6",
-        "sprintReport": true,
+        "inSprint": true,
         "explanationField": true,
         "storePoints": true,
         "throughputMap": false
     },{
-        "name": "IN PROGRESS",
+        "name": "In Progress",
         "color": "#b1adcb",
-        "sprintReport": true,
+        "inSprint": true,
         "explanationField": true,
         "storePoints": true,
         "throughputMap": false
     },{
-        "name": "CODE REVIEW",
+        "name": "Code Review",
         "color": "#dfdeea",
-        "sprintReport": true,
+        "inSprint": true,
         "explanationField": true,
         "storePoints": true,
         "throughputMap": false
 
     },{
-        "name": "BLOCKED",
+        "name": "Blocked",
         "color": "#abdab7",
-        "sprintReport": true,
+        "inSprint": true,
         "explanationField": true,
         "storePoints": true,
         "throughputMap": false
 
     },{
-        "name": "READY FOR QA",
+        "name": "Ready for QA",
         "color": "#6cbe82",
-        "sprintReport": true,
+        "inSprint": true,
         "explanationField": true,
         "storePoints": true,
         "throughputMap": false
 
     },{
-        "name": "IN QA",
+        "name": "In QA",
         "color": "#2ea36b",
-        "sprintReport": true,
+        "inSprint": true,
         "explanationField": true,
         "storePoints": true,
         "throughputMap": false
 
     },{
-        "name": "DONE",
+        "name": "Done",
         "color": "#2ea34d",
-        "sprintReport": true,
+        "inSprint": false,
         "explanationField": true,
         "storePoints": true,
         "throughputMap": true

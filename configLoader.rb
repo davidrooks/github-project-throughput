@@ -48,19 +48,19 @@ class ConfigLoader
         result = []
 
         allColumns.each_with_index do |column, i|
-            if column['sprintReport'] == true
+            if column['explanationField'] == true
                 result << column['name']
             end
         end
         result
     end
 
-    def getSprintReportColumns
+    def getInSprintColumns
         allColumns = getConfigValue('COLUMNS')
         result = []
 
         allColumns.each_with_index do |column, i|
-            if column['sprintReport'] == true
+            if column['inSprint'] == true
                 result << column['name']
             end
         end
