@@ -4,6 +4,13 @@
 "PROJECT": "2571291",
 "TITLE": "Cubs team dashboard",
 "LOG_LEVEL": "DEBUG",
+"EstimateMapping":[
+    {"TYPE: BUG": 1},
+    {"ESTIMATE 1": 1},
+    {"TERRITORY: GB": 5},
+    {"ESTIMATE 2": 2},
+    {"ESTIMATE 8": 8}
+],
 "COLUMNS": [{
         "name": "Analysis",
         "color": "#918cb6",

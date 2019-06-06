@@ -55,23 +55,50 @@ class Project < Github
 
         board = $BOARD
         issue_labels = []
+        allIssues = []
         board.each do |column, cards|
             # puts "cards #{cards}"
             puts "column #{column}"
             cards.each do |card|
                 if card.include?('content_url')
                     issue_url = card['content_url']
-                    puts "issue_url #{issue_url}"
+                    # puts ">>>>> card #{card}"
                     result = RestClient.get issue_url, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + $configLoader.getConfigValue('OAUTH')
                     issue = JSON.parse(result)
-                    puts "issue result #{issue}"
-                    if issue.include?('labels')
-                        issue_labels = issue.labels
-                        puts "?>>>>>>> issue_labels #{issue_labels}"
+                    # puts ">>>>> issue #{issue}"
+                    if result.include?('labels')
+                        issue_labels = issue["labels"]
+                        issue_labels.each_with_index do |labelKey, labelValue|
+                            labelName = labelKey["name"].upcase
+                            puts ">>>> Looking for label name #{labelName}"
+
+                            estimateMappings = $configLoader.getConfigValue("EstimateMapping")
+                                estimateMappings.each do |mappingKey, mappingValue |
+
+                                    puts ">>> mapping key: #{mappingKey}"
+
+                                    if mappingKey.include?(labelName)
+                                        # store the issue number locally, if its the same again, check
+                                        # the points from the last one, if its lower than current, delete the last item in the array
+                                        id = {}
+                                        id[issue["number"]] = mappingKey
+                                        allIssues << id
+                                        puts "FOUND IT again with mapping Key: #{mappingKey}"
+                                        next
+                                    end
+                                end
+
+                            # end
+                        end
+                        # puts "?>>>>>>> issue_labels #{issue["labels"]}"
+                        # puts "?>>>>>>> issue_ url #{issue["url"]}"
+                        # puts "?>>>>>>> issue_ labels_url #{issue["labels_url"]}"
                     end
                 end
             end
+
         end
+        puts "allIssuesallIssues: #{allIssues}"
         issue_labels
     end
 
