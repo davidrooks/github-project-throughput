@@ -12,6 +12,7 @@ class Project < Github
     PROJECTS_PATH = '/repos/' + $configLoader.getConfigValue('REPO') + '/projects'
 
     $BOARD = Hash.new()
+    $ISSUES_WITH_HIGHEST_POINTS = Hash.new()
 
 
     #   can be used to find the ID of your github projects as this is not exposed by github website
@@ -50,58 +51,73 @@ class Project < Github
         $BOARD = board
     end
 
-    def fetchLabelsForAllIssues
+    def fetchPointsForAllIssues
         kanban = Hash.new()
-
         board = $BOARD
-        issue_labels = []
-        allIssues = []
+        issuesWithColumn = []
+        issuesWithHighestPoints = []
+        currentIssue = 0
+
         board.each do |column, cards|
-            # puts "cards #{cards}"
-            puts "column #{column}"
+            issuesWithHighestPoints = []
             cards.each do |card|
                 if card.include?('content_url')
                     issue_url = card['content_url']
-                    # puts ">>>>> card #{card}"
                     result = RestClient.get issue_url, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + $configLoader.getConfigValue('OAUTH')
                     issue = JSON.parse(result)
-                    # puts ">>>>> issue #{issue}"
+                    issueFoundInEstimateMappings = false
+
                     if result.include?('labels')
                         issue_labels = issue["labels"]
+                        lastEstimate = 0
+
                         issue_labels.each_with_index do |labelKey, labelValue|
                             labelName = labelKey["name"].upcase
-                            puts ">>>> Looking for label name #{labelName}"
-
                             estimateMappings = $configLoader.getConfigValue("EstimateMapping")
-                                estimateMappings.each do |mappingKey, mappingValue |
 
-                                    puts ">>> mapping key: #{mappingKey}"
-
-                                    if mappingKey.include?(labelName)
-                                        # store the issue number locally, if its the same again, check
-                                        # the points from the last one, if its lower than current, delete the last item in the array
-                                        id = {}
-                                        id[issue["number"]] = mappingKey
-                                        allIssues << id
-                                        puts "FOUND IT again with mapping Key: #{mappingKey}"
-                                        next
+                            estimateMappings.each do |mappingKey|
+                                if mappingKey.include?(labelName)
+                                    issueFoundInEstimateMappings = false
+                                    mappingKey.each do | name, estimate |
+                                        if currentIssue == issue["number"]
+                                            if lastEstimate < estimate
+                                                issuesWithHighestPoints.pop
+                                                out = Hash.new()
+                                                out[issue["number"]] = estimate
+                                                issuesWithHighestPoints <<  out
+                                            end
+                                        else
+                                            out = Hash.new()
+                                            out[issue["number"]] = estimate
+                                            issuesWithHighestPoints <<  out
+                                        end
+                                        lastEstimate = estimate
+                                        currentIssue = issue["number"]
+                                        issueFoundInEstimateMappings = true
                                     end
                                 end
-
-                            # end
+                            end
                         end
-                        # puts "?>>>>>>> issue_labels #{issue["labels"]}"
-                        # puts "?>>>>>>> issue_ url #{issue["url"]}"
-                        # puts "?>>>>>>> issue_ labels_url #{issue["labels_url"]}"
+                    end
+                    if !issueFoundInEstimateMappings
+                        out = Hash.new()
+                        out[issue["number"]] = 3
+                        issuesWithHighestPoints <<  out
                     end
                 end
             end
-
+            if issuesWithHighestPoints.any?
+                data = {}
+                data[column] = issuesWithHighestPoints
+                issuesWithColumn << data
+            end
         end
-        puts "allIssuesallIssues: #{allIssues}"
-        issue_labels
+        $ISSUES_WITH_HIGHEST_POINTS = issuesWithColumn
     end
 
+    def getIssuesWithPoints()
+        return $ISSUES_WITH_HIGHEST_POINTS
+    end
 
     def storePoints()
         # store the state of the board start of the day and end of the day
