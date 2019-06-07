@@ -51,65 +51,67 @@ class Project < Github
         $BOARD = board
     end
 
-    def fetchPointsForAllIssues
+    def fetchPointsForInSprintIssues
         kanban = Hash.new()
         board = $BOARD
-        issuesWithColumn = []
+        issuesWithColumn = {}
         issuesWithHighestPoints = []
         currentIssue = 0
+        inSprintColumns = $configLoader.getInSprintColumns
 
-        board.each do |column, cards|
-            issuesWithHighestPoints = []
-            cards.each do |card|
-                if card.include?('content_url')
-                    issue_url = card['content_url']
-                    result = RestClient.get issue_url, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + $configLoader.getConfigValue('OAUTH')
-                    issue = JSON.parse(result)
-                    issueFoundInEstimateMappings = false
+        board.each do |currentColumn, cards|
+            if inSprintColumns.include?(currentColumn.upcase)
+                issuesWithHighestPoints = []
+                cards.each do |card|
+                    if card.include?('content_url')
+                        issue_url = card['content_url']
+                        result = RestClient.get issue_url, :accept => 'application/vnd.github.inertia-preview+json', :'Authorization' => 'token ' + $configLoader.getConfigValue('OAUTH')
+                        issue = JSON.parse(result)
+                        issueFoundInEstimateMappings = false
 
-                    if result.include?('labels')
-                        issue_labels = issue["labels"]
-                        lastEstimate = 0
+                        if result.include?('labels')
+                            issue_labels = issue["labels"]
+                            lastEstimate = 0
 
-                        issue_labels.each_with_index do |labelKey, labelValue|
-                            labelName = labelKey["name"].upcase
-                            estimateMappings = $configLoader.getConfigValue("EstimateMapping")
+                            issue_labels.each_with_index do |labelKey, labelValue|
+                                labelName = labelKey["name"].upcase
+                                estimateMappings = $configLoader.getConfigValue("EstimateMapping")
 
-                            estimateMappings.each do |mappingKey|
-                                if mappingKey.include?(labelName)
-                                    issueFoundInEstimateMappings = false
-                                    mappingKey.each do | name, estimate |
-                                        if currentIssue == issue["number"]
-                                            if lastEstimate < estimate
-                                                issuesWithHighestPoints.pop
+                                estimateMappings.each do |mappingKey|
+                                    if mappingKey.include?(labelName)
+                                        issueFoundInEstimateMappings = false
+                                        mappingKey.each do | name, estimate |
+                                            if currentIssue == issue["number"]
+                                                if lastEstimate < estimate
+                                                    issuesWithHighestPoints.pop
+                                                    out = Hash.new()
+                                                    out[issue["number"]] = estimate
+                                                    issuesWithHighestPoints <<  out
+                                                end
+                                            else
                                                 out = Hash.new()
                                                 out[issue["number"]] = estimate
                                                 issuesWithHighestPoints <<  out
                                             end
-                                        else
-                                            out = Hash.new()
-                                            out[issue["number"]] = estimate
-                                            issuesWithHighestPoints <<  out
+                                            lastEstimate = estimate
+                                            currentIssue = issue["number"]
+                                            issueFoundInEstimateMappings = true
                                         end
-                                        lastEstimate = estimate
-                                        currentIssue = issue["number"]
-                                        issueFoundInEstimateMappings = true
                                     end
                                 end
                             end
                         end
-                    end
-                    if !issueFoundInEstimateMappings
-                        out = Hash.new()
-                        out[issue["number"]] = 3
-                        issuesWithHighestPoints <<  out
+                        if !issueFoundInEstimateMappings
+                            out = Hash.new()
+                            out[issue["number"]] = $configLoader.getConfigValue('estimateMappingDefaultPoint')
+                            issuesWithHighestPoints <<  out
+                        end
                     end
                 end
-            end
-            if issuesWithHighestPoints.any?
-                data = {}
-                data[column] = issuesWithHighestPoints
-                issuesWithColumn << data
+
+                if issuesWithHighestPoints.any?
+                    issuesWithColumn[currentColumn] = issuesWithHighestPoints
+                end
             end
         end
         $ISSUES_WITH_HIGHEST_POINTS = issuesWithColumn

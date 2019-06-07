@@ -17,18 +17,7 @@
 <body>
 
     <div id="right-panel" class="right-panel">
-
-        <!-- Header-->
         <%= erb :menu %>
-        <!-- <header id="header" class="header">
-            <div class="header-menu">
-                <div class="col-sm-7">
-                    <div class="header-left">
-                        <a class="refresh" href="/refresh"><i class="fa fa-refresh"></i></a>
-                    </div>
-                </div>
-            </div>
-        </header> -->
 
         <div class="content">
             <div class="row d-flex justify-content-between">
@@ -112,8 +101,8 @@
                         <div class="card-body">
                             <div class="stat-widget-one">
                                 <div class="stat-content dib">
-                                    <span class="count"></span>
-                                    <p class="text-light">Placeholder<br />(tickets per day)</p>
+                                    <span class="count"><%= @totalSprintPoints %></span>
+                                    <p class="text-light">Total Points remaining<br />in the current sprint</p>
                                 </div>
                             </div>
 

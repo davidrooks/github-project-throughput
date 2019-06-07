@@ -29,27 +29,17 @@ class ConfigLoader
         allColumns = getConfigValue('COLUMNS')
         result = []
         allColumns.each_with_index do |column, i|
-            result << column['name']
+            result << column['name'].upcase
         end
         result
     end
 
-    def getAllColors
+    def getAllCumulativeFlowColors
         allColumns = getConfigValue('COLUMNS')
         result = []
         allColumns.each_with_index do |column, i|
-            result << column['color']
-        end
-        result
-    end
-
-    def getExplanationFieldColumns
-        allColumns = getConfigValue('COLUMNS')
-        result = []
-
-        allColumns.each_with_index do |column, i|
-            if column['explanationField'] == true
-                result << column['name']
+            if column['useForCumulativeFlowChart'] == true
+                result << column['color']
             end
         end
         result
@@ -61,7 +51,19 @@ class ConfigLoader
 
         allColumns.each_with_index do |column, i|
             if column['inSprint'] == true
-                result << column['name']
+                result << column['name'].upcase
+            end
+        end
+        result
+    end
+
+    def getUseForCumulativeFlowChartColumns
+        allColumns = getConfigValue('COLUMNS')
+        result = []
+
+        allColumns.each_with_index do |column, i|
+            if column['useForCumulativeFlowChart'] == true
+                result << column['name'].upcase
             end
         end
         result
@@ -73,7 +75,7 @@ class ConfigLoader
 
         allColumns.each_with_index do |column, i|
             if column['throughputMap'] == true
-                result << column['name']
+                result << column['name'].upcase
             end
         end
         result
@@ -83,7 +85,7 @@ class ConfigLoader
         allColumns = getConfigValue('COLUMNS')
         result = {}
         allColumns.each_with_index do |column, i|
-            result[column['name']] = 0
+            result[column['name'].upcase] = 0
         end
         result[:DATE] = "01/01/2019"
 

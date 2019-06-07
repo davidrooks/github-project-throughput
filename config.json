@@ -4,79 +4,71 @@
 "PROJECT": "2571291",
 "TITLE": "Cubs team dashboard",
 "LOG_LEVEL": "DEBUG",
+"estimateMappingDefaultPoint": 1,
 "EstimateMapping":[
     {"TYPE: BUG": 1},
     {"ESTIMATE 1": 1},
-    {"TERRITORY: GB": 5},
     {"ESTIMATE 2": 2},
+    {"ESTIMATE 3": 3},
+    {"ESTIMATE 4": 4},
+    {"ESTIMATE 5": 5},
+    {"ESTIMATE 6": 6},
+    {"ESTIMATE 7": 7},
     {"ESTIMATE 8": 8}
 ],
 "COLUMNS": [{
         "name": "Analysis",
-        "color": "#918cb6",
+        "color": "#ff0000",
         "inSprint": false,
-        "explanationField": true,
-        "storePoints": true,
+        "useForCumulativeFlowChart": true,
         "throughputMap": false
     },{
         "name": "Product Backlog",
-        "color": "#918cb6",
+        "color": "#e1e1ea",
         "inSprint": false,
-        "explanationField": true,
-        "storePoints": true,
+        "useForCumulativeFlowChart": false,
         "throughputMap": false
     },{
         "name": "Sprint Backlog",
-        "color": "#918cb6",
+        "color": "#800000",
         "inSprint": true,
-        "explanationField": true,
-        "storePoints": true,
+        "useForCumulativeFlowChart": true,
         "throughputMap": false
     },{
         "name": "In Progress",
-        "color": "#b1adcb",
+        "color": "#ff6600",
         "inSprint": true,
-        "explanationField": true,
-        "storePoints": true,
+        "useForCumulativeFlowChart": true,
         "throughputMap": false
     },{
         "name": "Code Review",
-        "color": "#dfdeea",
+        "color": "#ffff00",
         "inSprint": true,
-        "explanationField": true,
-        "storePoints": true,
+        "useForCumulativeFlowChart": true,
         "throughputMap": false
-
     },{
         "name": "Blocked",
-        "color": "#abdab7",
+        "color": "#4d1f00",
         "inSprint": true,
-        "explanationField": true,
-        "storePoints": true,
+        "useForCumulativeFlowChart": true,
         "throughputMap": false
-
     },{
         "name": "Ready for QA",
-        "color": "#6cbe82",
+        "color": "#00bfff",
         "inSprint": true,
-        "explanationField": true,
-        "storePoints": true,
+        "useForCumulativeFlowChart": true,
         "throughputMap": false
-
     },{
         "name": "In QA",
-        "color": "#2ea36b",
+        "color": "#8000ff",
         "inSprint": true,
-        "explanationField": true,
-        "storePoints": true,
+        "useForCumulativeFlowChart": true,
         "throughputMap": false
-
     },{
         "name": "Done",
-        "color": "#2ea34d",
+        "color": "#00ff00",
         "inSprint": false,
-        "explanationField": true,
-        "storePoints": true,
+        "useForCumulativeFlowChart": true,
         "throughputMap": true
     }]
 }

@@ -11,13 +11,10 @@ require './configLoader.rb'
 require 'date'
 
 class App < Sinatra::Base
-
-    # config_file = File.open('./config.json')
-
     $configLoader = ConfigLoader.new()
     PROJECT = Project.new()
     PROJECT.getProjectData()
-    PROJECT.fetchPointsForAllIssues()
+    PROJECT.fetchPointsForInSprintIssues()
     $PROJECT_DATA = PROJECT.transformData()
     $PROJECT_BOARD = PROJECT.getBoard()
     $ISSUES_WITH_HIGHEST_POINTS = PROJECT.getIssuesWithPoints()
@@ -45,6 +42,13 @@ class App < Sinatra::Base
         $ISSUES_WITH_HIGHEST_POINTS.to_json
     end
 
+    get '/api/sprint-points' do
+        content_type :json
+        $ROUTE = request.path_info
+
+        totalSprintPoints.to_json
+    end
+
     get '/api/summary' do
         content_type :json
         $ROUTE = request.path_info
@@ -65,7 +69,7 @@ class App < Sinatra::Base
         @work_days_required = (work_days_required).round
         @projected_delivery_date = projected_delivery_date.iso8601
 
-        @colors = $configLoader.getAllColors
+        @colors = $configLoader.getAllCumulativeFlowColors
 
         data = { cumulative_data: @cumulative_data, title: @title, type: @type, stacked: @stacked, open_tickets: @open_tickets, closed_tickets: @closed_tickets, throughput: @throughput, work_days_required: @work_days_required, projected_delivery_date: @projected_delivery_date, colors: @colors}.to_json
 
@@ -76,7 +80,7 @@ class App < Sinatra::Base
         $ROUTE = request.path_info
         today = Date.today
         @cumulative_data = getCumulativeFlowData
-        # print(@cumulative_data)
+        @totalSprintPoints = totalSprintPoints
         @title = $configLoader.getConfigValue('TITLE')
         @type = 'AreaChart'
         @stacked = true
@@ -91,7 +95,7 @@ class App < Sinatra::Base
         @work_days_required = (work_days_required).round
         @projected_delivery_date = projected_delivery_date.iso8601
 
-        @colors = $configLoader.getAllColors
+        @colors = $configLoader.getAllCumulativeFlowColors
 
         erb :index
     end
@@ -108,6 +112,7 @@ class App < Sinatra::Base
         @stacked = true
         @title = 'Cumulative Flow Diagram'
         @type = 'AreaChart'
+        @colors = $configLoader.getAllCumulativeFlowColors
         erb :chart
     end
 
@@ -116,8 +121,14 @@ class App < Sinatra::Base
         $ROUTE = request.path_info
         $PROJECT_BOARD.to_json
     end
-    # go through all http://localhost:9292/api/board in content_url
-    # from which go through the labels and save them
+
+    get '/api/config' do
+        content_type :json
+        $ROUTE = request.path_info
+        config_file = File.open('./config.json')
+        loadedConfig = JSON.load config_file
+        loadedConfig.to_json
+    end
 
     get '/api/cumulative-flow-diagram' do
         content_type :json
@@ -173,6 +184,27 @@ class App < Sinatra::Base
         erb :chart
     end
 
+    def totalSprintPoints()
+        allColumns= $ISSUES_WITH_HIGHEST_POINTS
+        sprintColumns = $configLoader.getInSprintColumns
+
+        overallTotalIssues = 0
+
+        sprintColumns.each_with_index do |sprintColumn, index|
+            allColumns.each_with_index do | boardColumnWithPoints, i |
+
+                if boardColumnWithPoints.include?(sprintColumn.upcase)
+                    totalInColumn = 0
+                    boardColumnWithPoints[1].each_with_index do |items, i|
+                        totalInColumn = items.values.first + totalInColumn
+                    end
+                    overallTotalIssues = totalInColumn + overallTotalIssues
+                end
+            end
+        end
+        overallTotalIssues
+    end
+
     def getThroughputData()
         dataJson = getDataJson($configLoader.getThroughputColumn)
         current = []
@@ -194,7 +226,7 @@ class App < Sinatra::Base
 
 
     def getCumulativeFlowData()
-        data = getData(['TIME'].concat($configLoader.getAllColumns))
+        data = getData(['TIME'].concat($configLoader.getUseForCumulativeFlowChartColumns))
         data.each_with_index do |d, i|
             if i <= 1
                 next
