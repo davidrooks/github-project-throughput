@@ -4,6 +4,7 @@ require 'time'
 require 'rest-client'
 require 'sinatra/base'
 require 'tilt/erb'
+require './dummyData.rb'
 require './project.rb'
 require 'yaml'
 require './github.rb'
@@ -12,12 +13,23 @@ require 'date'
 
 class App < Sinatra::Base
     $configLoader = ConfigLoader.new()
-    PROJECT = Project.new()
-    PROJECT.getProjectData()
-    PROJECT.fetchPointsForInSprintIssues()
-    $PROJECT_DATA = PROJECT.transformData()
-    $PROJECT_BOARD = PROJECT.getBoard()
-    $ISSUES_WITH_HIGHEST_POINTS = PROJECT.getIssuesWithPoints()
+    useDummyData = true
+    if useDummyData
+        puts ">>>>> using dummy Data"
+        PROJECT = DummyData.new()
+        PROJECT.getProjectData()
+        PROJECT.fetchPointsForInSprintIssues()
+        $PROJECT_DATA = PROJECT.transformData()
+        $PROJECT_BOARD = PROJECT.getBoard()
+        $ISSUES_WITH_HIGHEST_POINTS = PROJECT.getIssuesWithPoints()
+    else
+        PROJECT = Project.new()
+        PROJECT.getProjectData()
+        PROJECT.fetchPointsForInSprintIssues()
+        $PROJECT_DATA = PROJECT.transformData()
+        $PROJECT_BOARD = PROJECT.getBoard()
+        $ISSUES_WITH_HIGHEST_POINTS = PROJECT.getIssuesWithPoints()
+    end
     # $PROJECT_DATA = {"2019-05-09"=>{"INFORMATION"=>1, "DONE"=>1}, "2019-05-22"=>{"ANALYSIS"=>2}, "2019-05-23"=>{"ANALYSIS"=>3}, "2019-05-30"=>{"ANALYSIS"=>2, "PRODUCT BACKLOG"=>1, "CODE REVIEW"=>1, "BLOCKED"=>3, "DONE"=>1}, "2019-05-24"=>{"ANALYSIS"=>2, "BLOCKED"=>1, "DONE"=>1}, "2019-06-03"=>{"ANALYSIS"=>2, "IN PROGRESS"=>2, "READY FOR QA"=>1, "IN QA"=>2}, "2019-05-31"=>{"ANALYSIS"=>1, "PRODUCT BACKLOG"=>3, "CODE REVIEW"=>2, "READY FOR QA"=>1, "DONE"=>4}, "2019-05-29"=>{"PRODUCT BACKLOG"=>3, "SPRINT BACKLOG"=>3, "CODE REVIEW"=>1, "READY FOR QA"=>2, "IN QA"=>1, "DONE"=>1}, "2019-05-28"=>{"IN PROGRESS"=>1, "READY FOR QA"=>1, "DONE"=>3}, "2019-05-20"=>{"IN PROGRESS"=>1, "DONE"=>2}, "2019-05-21"=>{"CODE REVIEW"=>1, "BLOCKED"=>2, "DONE"=>1}, "2019-05-08"=>{"BLOCKED"=>1}, "2019-05-14"=>{"BLOCKED"=>3}, "2019-05-16"=>{"DONE"=>3}, "2019-05-15"=>{"DONE"=>2}, "2019-05-13"=>{"DONE"=>1}}
 
     $ROUTE = '/'
