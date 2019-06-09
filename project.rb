@@ -1,18 +1,18 @@
 # Language: Ruby, Level: Level 3
 require './github.rb'
-require './ConfigLoader.rb'
+require './modelAccessor.rb'
+require './configLoader.rb'
 
 class Project < Github
 
     def initialize
         super()
     end
+
+    $modelAccessor = ModelAccessor.new
     $configLoader = ConfigLoader.new()
     PROJECT_PATH = '/projects/' + $configLoader.getConfigValue('PROJECT') + '/columns'
     PROJECTS_PATH = '/repos/' + $configLoader.getConfigValue('REPO') + '/projects'
-
-    $BOARD = Hash.new()
-    $ISSUES_WITH_HIGHEST_POINTS = Hash.new()
 
 
     #   can be used to find the ID of your github projects as this is not exposed by github website
@@ -21,7 +21,7 @@ class Project < Github
         result = JSON.parse(result)
     end
 
-    def getProjectData()
+    def getBoardData()
         board = Hash.new()
         @logger.debug 'getting issues from ' + GITHUB_API
         begin
@@ -48,12 +48,12 @@ class Project < Github
             @logger.debug e.backtrace
             @logger.debug '-----------------------'
         end
-        $BOARD = board
+        $modelAccessor.getProjectModel.board = board
     end
 
     def fetchPointsForInSprintIssues
         kanban = Hash.new()
-        board = $BOARD
+        board = $modelAccessor.getProjectModel.board
         issuesWithColumn = {}
         issuesWithHighestPoints = []
         currentIssue = 0
@@ -114,12 +114,9 @@ class Project < Github
                 end
             end
         end
-        $ISSUES_WITH_HIGHEST_POINTS = issuesWithColumn
+        $modelAccessor.getProjectModel.issue_with_points = issuesWithColumn
     end
 
-    def getIssuesWithPoints()
-        return $ISSUES_WITH_HIGHEST_POINTS
-    end
 
     def storePoints()
         # store the state of the board start of the day and end of the day
@@ -134,7 +131,7 @@ class Project < Github
     end
 
     def getBoard()
-        return $BOARD
+        return $modelAccessor.getProjectModel.board
     end
 
     def estimatedSizeInColumns()
@@ -144,7 +141,7 @@ class Project < Github
         # Also to fetch investigation cards and give them a pointer
         # kanban = Hash.new()
 
-        # board = $BOARD
+        # board = $modelAccessor.getProjectModel.board
         #
         # board.each do |column, cards|
         #     cards.each do |card|
@@ -153,10 +150,10 @@ class Project < Github
         # end
     end
 
-    def transformData()
+    def transformDataWithSinglePoint()
       kanban = Hash.new()
 
-      board = $BOARD
+      board = $modelAccessor.getProjectModel.board
 
       board.each do |column, cards|
         cards.each do |card|
@@ -190,13 +187,14 @@ class Project < Github
       @logger.info 'Current ticket state...'
       @logger.info kanban.to_s
       @logger.info '=============================================='
+      $modelAccessor.getProjectModel.issues_with_single_point = kanban
       return kanban
     end
 
     def transformDataWithPoints()
       kanban = Hash.new()
-      board = $BOARD
-      issuesWithHighestPoints = $ISSUES_WITH_HIGHEST_POINTS
+      board = $modelAccessor.getProjectModel.board
+      issuesWithHighestPoints = $modelAccessor.getProjectModel.getIssueWithPoints
       board.each do |column, cards|
         cards.each do |card|
             opened_on = Date.parse(card['created_at'].to_s).iso8601
@@ -207,7 +205,6 @@ class Project < Github
                 issuesWithHighestPoints[column.upcase].each do |issue|
                     if issue.key?(issue_number.to_i)
                         issue_points = issue[issue_number.to_i].to_i
-                        puts ">>>>> found #{issue_number} with #{issue_points} points for #{updated_on} column: #{column.upcase}"
                     end
                 end
                 if column.upcase.eql? 'TO DO'
@@ -238,7 +235,8 @@ class Project < Github
       @logger.info 'Current ticket state...'
       @logger.info kanban.to_s
       @logger.info '=============================================='
-      
+
+      $modelAccessor.getProjectModel.issue_transformed_with_points = kanban
       return kanban
     end
 end

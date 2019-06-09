@@ -4,6 +4,7 @@
 "PROJECT": "2571291",
 "TITLE": "Cubs team dashboard",
 "LOG_LEVEL": "DEBUG",
+"useDummyData": false,
 "estimateMappingDefaultPoint": 1,
 "EstimateMapping":[
     {"TYPE: BUG": 1},

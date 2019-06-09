@@ -11,6 +11,7 @@
         var options = {
           title: '',
           legend: {position: 'bottom'},
+          chartArea: {width: '900'},
           hAxis: {title: '', titleTextStyle: {color: '#333'}, showTextEvery: 10},
           vAxis: {title: 'Tasks', minValue: 0},
           seriesType: 'bars',
@@ -26,8 +27,9 @@
           title: '',
           colors: <%= @colors %>,
           legend: {position: 'top'},
-          hAxis: {title: 'Time', slantedText:true, slantedTextAngle:90, titleTextStyle: {color: '#333'}, showTextEvery: 10},
-          vAxis: {title: 'Tasks', minValue: 0},
+          chartArea: {width: '900'},
+          hAxis: {titleTextStyle: {color: '#333'}, showTextEvery: 10},
+          vAxis: {title: 'Issues', minValue: 0},
         };
 
 
