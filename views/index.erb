@@ -11,22 +11,19 @@
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="assets/css/themify-icons.css">
     <link rel="stylesheet" href="assets/css/flag-icon.min.css">
-    <link rel="stylesheet" href="assets/css/cs-skin-elastic.css">
     <link rel="stylesheet" href="assets/scss/style.css">
 </head>
 <body>
-
-    <div id="right-panel" class="right-panel">
         <%= erb :menu %>
 
-        <div class="content">
+        <div class="container">
             <div class="row d-flex justify-content-between">
 
                 <div class="d-flex col">
                     <div class="card w-100 text-white <%= @warn ? "bg-flat-color-1" : "bg-flat-color-1" %>">
                         <div class="card-body pb-0">
                             <div class="stat-widget-one">
-                                <div class="stat-icon dib">
+                                <div class="stat-icon dib icon-center">
                                     <i class="ti-calendar"></i>
                                 </div>
                                 <div class="stat-content dib">
@@ -45,7 +42,7 @@
                     <div class="card w-100 text-white bg-flat-color-1"">
                         <div class="card-body pb-0">
                             <div class="stat-widget-one">
-                                <div class="stat-icon dib">
+                                <div class="stat-icon dib icon-center">
                                     <i class="ti-alarm-clock"></i>
                                 </div>
                                 <div class="stat-content dib">
@@ -63,7 +60,7 @@
                     <div class="card w-100 text-white bg-flat-color-1">
                         <div class="card-body pb-0">
                             <div class="stat-widget-one">
-                                <div class="stat-icon dib">
+                                <div class="stat-icon dib icon-center">
                                     <i class="ti-github"></i>
                                 </div>
                                 <div class="stat-content dib">
@@ -73,7 +70,7 @@
                                     </h4>
                                     <h4 class="mb-0">
                                         <span class="count"><%= @open_tickets %></span>
-                                        <p class="text-light">Open tickets</p>
+                                        <p class="text-light" data-html="true" data-toggle="tooltip" title="Sum of all these columns points: <br/> <u><%= @currentSprintColumns %></u>">Open tickets</p>
                                     </h4>
                                 </div>
                             </div>
@@ -86,9 +83,16 @@
                     <div class="card w-100 text-white bg-flat-color-1">
                         <div class="card-body">
                             <div class="stat-widget-one">
+                                <div class="stat-icon dib icon-center">
+                                    <i class="ti-pulse"></i>
+                                </div>
                                 <div class="stat-content dib">
-                                    <span class="count"><%= @throughput %></span>
-                                    <p class="text-light">Current throughput<br />(tickets per day)</p>
+                                    <span class="count"><%= @ticketsThroughput %></span>
+                                    <p class="text-light" data-html="true" data-toggle="tooltip" title="Throughput column is: <br/> <u><%= @throughputColumns %></u>"> Throughput<br />(tickets per day)</p>
+                                </div>
+                                <div class="stat-content dib">
+                                    <span class="count"><%= @pointsThroughput %></span>
+                                    <p class="text-light" data-html="true" data-toggle="tooltip" title="Throughput column is: <br/> <u><%= @throughputColumns %></u>"> Throughput<br />(points per day)</p>
                                 </div>
                             </div>
 
@@ -100,9 +104,14 @@
                     <div class="card w-100 text-white bg-flat-color-1">
                         <div class="card-body">
                             <div class="stat-widget-one">
+                                <div class="stat-icon dib icon-center">
+                                    <i class="ti-dashboard"></i>
+                                </div>
                                 <div class="stat-content dib">
                                     <span class="count"><%= @totalSprintPoints %></span>
-                                    <p class="text-light">Total Points remaining<br />in the current sprint</p>
+                                    <p class="text-light" data-html="true" data-toggle="tooltip" title="Sum of all these columns points: <br/> <u><%= @currentSprintColumns %></u>">
+                                        Total Points remaining<br />in the current sprint
+                                    </p>
                                 </div>
                             </div>
 
@@ -136,33 +145,33 @@
                 </div>
             </div>
         </div> <!-- .content -->
-    </div><!-- /#right-panel -->
-
-    <!-- Right Panel -->
 
     <script src="assets/js/vendor/jquery-2.1.4.min.js"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChart);
         function drawChart() {
             var data = google.visualization.arrayToDataTable(<%= @cumulative_data %>);
-
             var options = {
-                isStacked: <%= @stacked %>,
-                title: '',
-                legend: {position: 'none'},
-                colors: <%= @colors %>,
-                chartArea: {top: '1%', 'width': '100%', 'height': '80%'},
-                hAxis: {title: '',  titleTextStyle: {color: '#333'}, showTextEvery: 2},
-                vAxis: {title: 'Tickets', minValue: 0},
+              isStacked: <%= @stacked %>,
+              title: '',
+              legend: {position: 'none'},
+              colors: <%= @colors %>,
+              chartArea: {width: '900', top: '1%'},
+              hAxis: {title: '', titleTextStyle: {color: '#333'}, showTextEvery: 10},
+              vAxis: {title: 'Issues', minValue: 0},
             };
-
 
             var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
 
             chart.draw(data, options);
         }
+        $(function () {
+          $('[data-toggle="tooltip"]').tooltip()
+        })
     </script>
 </body>
 </html>

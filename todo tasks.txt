@@ -1,0 +1,2 @@
+Todo:
+Store throughput on a specific day using the crob job to run it on that specific day

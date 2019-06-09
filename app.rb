@@ -13,7 +13,7 @@ require 'date'
 
 class App < Sinatra::Base
     $configLoader = ConfigLoader.new()
-    useDummyData = true
+    useDummyData = false
     if useDummyData
         puts ">>>>> using dummy Data"
         PROJECT = DummyData.new()
@@ -22,6 +22,7 @@ class App < Sinatra::Base
         $PROJECT_DATA = PROJECT.transformData()
         $PROJECT_BOARD = PROJECT.getBoard()
         $ISSUES_WITH_HIGHEST_POINTS = PROJECT.getIssuesWithPoints()
+        $PROJECT_DATA_WITH_POINTS = PROJECT.transformDataWithPoints()
     else
         PROJECT = Project.new()
         PROJECT.getProjectData()
@@ -29,6 +30,7 @@ class App < Sinatra::Base
         $PROJECT_DATA = PROJECT.transformData()
         $PROJECT_BOARD = PROJECT.getBoard()
         $ISSUES_WITH_HIGHEST_POINTS = PROJECT.getIssuesWithPoints()
+        $PROJECT_DATA_WITH_POINTS = PROJECT.transformDataWithPoints()
     end
     # $PROJECT_DATA = {"2019-05-09"=>{"INFORMATION"=>1, "DONE"=>1}, "2019-05-22"=>{"ANALYSIS"=>2}, "2019-05-23"=>{"ANALYSIS"=>3}, "2019-05-30"=>{"ANALYSIS"=>2, "PRODUCT BACKLOG"=>1, "CODE REVIEW"=>1, "BLOCKED"=>3, "DONE"=>1}, "2019-05-24"=>{"ANALYSIS"=>2, "BLOCKED"=>1, "DONE"=>1}, "2019-06-03"=>{"ANALYSIS"=>2, "IN PROGRESS"=>2, "READY FOR QA"=>1, "IN QA"=>2}, "2019-05-31"=>{"ANALYSIS"=>1, "PRODUCT BACKLOG"=>3, "CODE REVIEW"=>2, "READY FOR QA"=>1, "DONE"=>4}, "2019-05-29"=>{"PRODUCT BACKLOG"=>3, "SPRINT BACKLOG"=>3, "CODE REVIEW"=>1, "READY FOR QA"=>2, "IN QA"=>1, "DONE"=>1}, "2019-05-28"=>{"IN PROGRESS"=>1, "READY FOR QA"=>1, "DONE"=>3}, "2019-05-20"=>{"IN PROGRESS"=>1, "DONE"=>2}, "2019-05-21"=>{"CODE REVIEW"=>1, "BLOCKED"=>2, "DONE"=>1}, "2019-05-08"=>{"BLOCKED"=>1}, "2019-05-14"=>{"BLOCKED"=>3}, "2019-05-16"=>{"DONE"=>3}, "2019-05-15"=>{"DONE"=>2}, "2019-05-13"=>{"DONE"=>1}}
 
@@ -52,6 +54,13 @@ class App < Sinatra::Base
         $ROUTE = request.path_info
 
         $ISSUES_WITH_HIGHEST_POINTS.to_json
+    end
+
+    get '/api/test' do
+        content_type :json
+        $ROUTE = request.path_info
+
+        $PROJECT_DATA_WITH_POINTS.to_json
     end
 
     get '/api/sprint-points' do
@@ -81,9 +90,10 @@ class App < Sinatra::Base
         @work_days_required = (work_days_required).round
         @projected_delivery_date = projected_delivery_date.iso8601
 
-        @colors = $configLoader.getAllCumulativeFlowColors
+        @colors = $configLoader.getAllCumulativeFlowColors.reverse
+        @currentSprintColumns = $configLoader.getInSprintColumns
 
-        data = { cumulative_data: @cumulative_data, title: @title, type: @type, stacked: @stacked, open_tickets: @open_tickets, closed_tickets: @closed_tickets, throughput: @throughput, work_days_required: @work_days_required, projected_delivery_date: @projected_delivery_date, colors: @colors}.to_json
+        data = { cumulative_data: @cumulative_data, currentSprintColumns: @currentSprintColumns, title: @title, type: @type, stacked: @stacked, open_tickets: @open_tickets, closed_tickets: @closed_tickets, throughput: @throughput, work_days_required: @work_days_required, projected_delivery_date: @projected_delivery_date, colors: @colors}.to_json
 
         data
     end
@@ -92,22 +102,29 @@ class App < Sinatra::Base
         $ROUTE = request.path_info
         today = Date.today
         @cumulative_data = getCumulativeFlowData
-        @totalSprintPoints = totalSprintPoints
         @title = $configLoader.getConfigValue('TITLE')
         @type = 'AreaChart'
         @stacked = true
-        @open_tickets = getTotalInSprintIssues
-        @closed_tickets = getTotalIssuesInAColumn("Done")
         data = getThroughputData
+        pointsData = getPointsThroughputData
         throughput = data.last.last
-        @throughput = data.last.last.round(2)
+        pointsThroughput = pointsData.last.last
+        @open_tickets = getTotalInSprintIssues
         work_days_required = throughput * @open_tickets
         days_required = (work_days_required + (work_days_required*2/7)).round
         projected_delivery_date = today + days_required
-        @work_days_required = (work_days_required).round
-        @projected_delivery_date = projected_delivery_date.iso8601
 
-        @colors = $configLoader.getAllCumulativeFlowColors
+        @colors = $configLoader.getAllCumulativeFlowColors.reverse
+        @currentSprintColumns = $configLoader.getInSprintColumns.join("<br/> ").capitalize
+        @throughputColumns = $configLoader.getThroughputColumn.join("<br/> ").capitalize
+
+        @projected_delivery_date = projected_delivery_date.iso8601
+        @work_days_required = (work_days_required).round
+        @closed_tickets = getTotalIssuesInAColumn("Done")
+
+        @ticketsThroughput = throughput.round(2)
+        @pointsThroughput = pointsThroughput.round(2)
+        @totalSprintPoints = totalSprintPoints
 
         erb :index
     end
@@ -124,7 +141,7 @@ class App < Sinatra::Base
         @stacked = true
         @title = 'Cumulative Flow Diagram'
         @type = 'AreaChart'
-        @colors = $configLoader.getAllCumulativeFlowColors
+        @colors = $configLoader.getAllCumulativeFlowColors.reverse
         erb :chart
     end
 
@@ -148,6 +165,7 @@ class App < Sinatra::Base
         @stacked = true
         @title = 'Cumulative Flow Diagram'
         @type = 'AreaChart'
+        @colors = $configLoader.getAllCumulativeFlowColors.reverse
 
         hashview = params['hashview']
         if (hashview == 'true')
@@ -167,14 +185,14 @@ class App < Sinatra::Base
             @data  = getCumulativeFlowData
         end
 
-        {title: @title, type: @type, stacked: @stacked, throughputData: @data}.to_json
+        {title: @title, type: @type, stacked: @stacked, throughputData: @data, colors: @colors}.to_json
     end
 
-    get '/api/throughput' do
+    get '/api/ticket-throughput' do
         content_type :json
         $ROUTE = request.path_info
         @stacked = false
-        @title = 'Throughput'
+        @title = 'Ticket throughput'
         @type = 'ComboChart'
 
         hashview = params['hashview']
@@ -184,6 +202,16 @@ class App < Sinatra::Base
         else
             @data  = getThroughputData
         end
+        {title: @title, type: @type, stacked: @stacked, throughputData: @data}.to_json
+    end
+
+    get '/api/points-throughput' do
+        content_type :json
+        $ROUTE = request.path_info
+        @stacked = false
+        @title = 'Points throughput'
+        @type = 'ComboChart'
+        @data  = getPointsThroughputData
         {title: @title, type: @type, stacked: @stacked, throughputData: @data}.to_json
     end
 
@@ -199,7 +227,6 @@ class App < Sinatra::Base
     def totalSprintPoints()
         allColumns= $ISSUES_WITH_HIGHEST_POINTS
         sprintColumns = $configLoader.getInSprintColumns
-
         overallTotalIssues = 0
 
         sprintColumns.each_with_index do |sprintColumn, index|
@@ -236,9 +263,29 @@ class App < Sinatra::Base
         [header].concat(current)
     end
 
+    def getPointsThroughputData()
+        dataJson = getDataJsonWithPoints($configLoader.getThroughputColumn)
+        allColumns= $ISSUES_WITH_HIGHEST_POINTS
+        current = []
+        total_done = 0
+
+        dataJson.each_with_index do |d,i|
+            total_done = d["DONE"] + total_done
+
+            d["average"] = total_done.to_f/(i+1)
+            response = []
+            response[0] = d[:DATE]
+            response[1] = d["DONE"]
+            response[2] = total_done.to_f/(i+1)
+            current << response
+        end
+        header = ['date', 'done', 'average']
+        [header].concat(current)
+    end
+
 
     def getCumulativeFlowData()
-        data = getData(['TIME'].concat($configLoader.getUseForCumulativeFlowChartColumns))
+        data = getData(['TIME'].concat($configLoader.getUseForCumulativeFlowChartColumns.reverse))
         data.each_with_index do |d, i|
             if i <= 1
                 next
@@ -299,6 +346,34 @@ class App < Sinatra::Base
                 if $PROJECT_DATA.has_key? d.iso8601
                     format.each_with_index do |k, i|
                         current[format[i].upcase] = $PROJECT_DATA[d.iso8601][format[i].upcase] || 0
+                    end
+                else
+                    format.each_with_index do |k, i|
+                        current[format[i].upcase] = 0
+                    end
+                end
+            end
+            response << current
+        end
+        response
+    end
+
+    def getDataJsonWithPoints(format)
+        response = []
+
+        min_date = Date.parse($PROJECT_DATA_WITH_POINTS.keys.sort.first)
+        max_date = Date.today
+
+        min_date.upto(max_date) do |d|
+            if d.saturday? || d.sunday?
+                next
+            end
+            current = {}
+            format.each_with_index do |key, index|
+                current = {"DATE": d.iso8601}
+                if $PROJECT_DATA_WITH_POINTS.has_key? d.iso8601
+                    format.each_with_index do |k, i|
+                        current[format[i].upcase] = $PROJECT_DATA_WITH_POINTS[d.iso8601][format[i].upcase] || 0
                     end
                 else
                     format.each_with_index do |k, i|

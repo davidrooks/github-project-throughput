@@ -57,7 +57,7 @@ class Project < Github
         issuesWithColumn = {}
         issuesWithHighestPoints = []
         currentIssue = 0
-        inSprintColumns = $configLoader.getInSprintColumns
+        inSprintColumns = $configLoader.getAllColumns
 
         board.each do |currentColumn, cards|
             if inSprintColumns.include?(currentColumn.upcase)
@@ -190,6 +190,55 @@ class Project < Github
       @logger.info 'Current ticket state...'
       @logger.info kanban.to_s
       @logger.info '=============================================='
+      return kanban
+    end
+
+    def transformDataWithPoints()
+      kanban = Hash.new()
+      board = $BOARD
+      issuesWithHighestPoints = $ISSUES_WITH_HIGHEST_POINTS
+      board.each do |column, cards|
+        cards.each do |card|
+            opened_on = Date.parse(card['created_at'].to_s).iso8601
+            updated_on = Date.parse(card['updated_at'].to_s).iso8601
+            issue_points = 1
+            if card.key?('content_url')
+                issue_number = card['content_url'].split('/')[-1]
+                issuesWithHighestPoints[column.upcase].each do |issue|
+                    if issue.key?(issue_number.to_i)
+                        issue_points = issue[issue_number.to_i].to_i
+                        puts ">>>>> found #{issue_number} with #{issue_points} points for #{updated_on} column: #{column.upcase}"
+                    end
+                end
+                if column.upcase.eql? 'TO DO'
+                    if !kanban.has_key? opened_on
+                        kanban[opened_on] = Hash.new()
+                    end
+
+                    if !kanban[opened_on].has_key? 'TO DO'
+                        kanban[opened_on]['TO DO'] = issue_points
+                    else
+                        kanban[opened_on]['TO DO'] += issue_points
+                    end
+                else
+                    if !kanban.has_key? updated_on
+                        kanban[updated_on] = Hash.new()
+                    end
+                    if !kanban[updated_on].has_key? column.upcase
+                        kanban[updated_on][column.upcase] = issue_points
+                    else
+                        kanban[updated_on][column.upcase] += issue_points
+                    end
+                end
+            end
+        end
+      end
+      puts 'transformed data with points'
+      @logger.info '=============================================='
+      @logger.info 'Current ticket state...'
+      @logger.info kanban.to_s
+      @logger.info '=============================================='
+      
       return kanban
     end
 end

@@ -30,7 +30,7 @@
         "throughputMap": false
     },{
         "name": "Sprint Backlog",
-        "color": "#800000",
+        "color": "#0055ff",
         "inSprint": true,
         "useForCumulativeFlowChart": true,
         "throughputMap": false

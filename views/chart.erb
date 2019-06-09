@@ -10,7 +10,8 @@
         <% if @type=="ComboChart" %>
         var options = {
           title: '',
-          hAxis: {title: 'Time',  direction:-1, slantedText:true, slantedTextAngle:90, titleTextStyle: {color: '#333'}, showTextEvery: 10},
+          legend: {position: 'bottom'},
+          hAxis: {title: '', titleTextStyle: {color: '#333'}, showTextEvery: 10},
           vAxis: {title: 'Tasks', minValue: 0},
           seriesType: 'bars',
           series: {1: {type: 'line'}}
@@ -24,7 +25,8 @@
           isStacked: <%= @stacked %>,
           title: '',
           colors: <%= @colors %>,
-          hAxis: {title: 'Time',  direction:-1, slantedText:true, slantedTextAngle:90, titleTextStyle: {color: '#333'}, showTextEvery: 20},
+          legend: {position: 'top'},
+          hAxis: {title: 'Time', slantedText:true, slantedTextAngle:90, titleTextStyle: {color: '#333'}, showTextEvery: 10},
           vAxis: {title: 'Tasks', minValue: 0},
         };
 
@@ -37,11 +39,23 @@
   </head>
   <body>
     <%= erb :menu %>
-    <H1><%= @title %></H1>
-    <% if @type=="ComboChart" %>
-      <H3>Based on current throughput expected project completion date = <%= @project_end_date %> </H2>
-      <H3>Required throughput = <%= @required_throughput %> tickets per day</H2>
-    <% end %>
-    <div id="chart_div" style="width: 1800px; height: 800px;"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <H1><%= @title %></H1>
+                <% if @type=="ComboChart" %>
+                  <H3>Based on current throughput expected project completion date = <%= @project_end_date %> </H3>
+                  <H3>Required throughput = <%= @required_throughput %> tickets per day</H3>
+                <% end %>
+            </div>
+        </div>
+        <div class="row">
+            <div class="container-fluid">
+                <div class="card">
+                    <div class="container-fluid" id="chart_div" style="height: 800px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
   </body>
 </html>
