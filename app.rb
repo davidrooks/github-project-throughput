@@ -10,7 +10,7 @@ require 'yaml'
 require './github.rb'
 require './configLoader.rb'
 require './apiRoutes.rb'
-require './ModelAccessor.rb'
+require './modelAccessor.rb'
 require './dataUtils.rb'
 require 'date'
 require './githubProcessor.rb'
@@ -41,11 +41,6 @@ class App < Sinatra::Base
     def active_page?(path='')
         request.path_info == '/' + path
     end
-
-# Create /api/
-# Use those api pages to run the .erb files, perhaps use jquery Fetch to load it?
-# The api can then be ran once a night using cron job for data to be stored on a file etc. This file will contain daily data for creating graphs etc
-
 
     get '/' do
         redirect '/summary'

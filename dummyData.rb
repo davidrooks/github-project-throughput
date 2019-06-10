@@ -1,7 +1,7 @@
 # Language: Ruby, Level: Level 3
 require './github.rb'
-require './ConfigLoader.rb'
-require './ModelAccessor.rb'
+require './configLoader.rb'
+require './modelAccessor.rb'
 
 class DummyData < Github
 

@@ -1,2 +1,7 @@
 Todo:
 Store throughput on a specific day using the crob job to run it on that specific day
+
+
+# Create /api/
+# Use those api pages to run the .erb files, perhaps use jquery Fetch to load it?
+# The api can then be ran once a night using cron job for data to be stored on a file etc. This file will contain daily data for creating graphs etc

@@ -4,7 +4,7 @@ require 'time'
 require 'rest-client'
 require 'logger'
 require 'yaml'
-require './ConfigLoader.rb'
+require './configLoader.rb'
 
 class Github < ConfigLoader
     GITHUB_API = 'https://api.github.com'

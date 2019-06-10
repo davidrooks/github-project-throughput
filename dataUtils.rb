@@ -1,5 +1,5 @@
 require './githubProcessor.rb'
-require './ModelAccessor.rb'
+require './modelAccessor.rb'
 
 class DataUtils
 
