@@ -1,4 +1,4 @@
-require './ProjectModel.rb'
+require './projectModel.rb'
 
 class ModelAccessor
     $projectModel = ProjectModel.new
