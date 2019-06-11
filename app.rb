@@ -79,7 +79,9 @@ class App < Sinatra::Base
 
     get '/refresh' do
         PROJECT.getBoardData()
+        PROJECT.fetchPointsForInSprintIssues()
         PROJECT.transformDataWithSinglePoint()
+        PROJECT.transformDataWithPoints()
         redirect '/summary'
     end
 

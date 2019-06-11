@@ -1,6 +1,7 @@
 Todo:
 Store throughput on a specific day using the crob job to run it on that specific day
 
+when calculating number of days to finish the job, include bank holidays
 
 # Create /api/
 # Use those api pages to run the .erb files, perhaps use jquery Fetch to load it?
