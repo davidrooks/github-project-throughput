@@ -4,14 +4,14 @@ class ApiRoutes < Sinatra::Base
         content_type :json
         $ROUTE = request.path_info
 
-        $modelAccessor.getProjectModel.getIssueWithPoints.to_json
+        $projectModel.getIssueWithPoints.to_json
     end
 
     get '/api/transformed-points' do
         content_type :json
         $ROUTE = request.path_info
 
-        $modelAccessor.getProjectModel.getTransformedIssuesWithSinglePoint.to_json
+        $projectModel.getTransformedIssuesWithSinglePoint.to_json
     end
 
     get '/api/sprint-points' do
@@ -58,7 +58,7 @@ class ApiRoutes < Sinatra::Base
     get '/api/board' do
         content_type :json
         $ROUTE = request.path_info
-        $modelAccessor.getProjectModel.board.to_json
+        $projectModel.board.to_json
     end
 
     get '/api/config' do
@@ -76,24 +76,7 @@ class ApiRoutes < Sinatra::Base
         @title = 'Cumulative Flow Diagram'
         @type = 'AreaChart'
         @colors = $configLoader.getAllCumulativeFlowColors.reverse
-
-        hashview = params['hashview']
-        if (hashview == 'true')
-            jsonData = getDataJson($configLoader.getAllColumns)
-            previousResult = $configLoader.emptyBoardColumns
-
-            $configLoader.getAllColumns.each_with_index do |column, j|
-                jsonData.each_with_index do |d, i|
-                    if d[column].class == Integer
-                        d[column] = d[column] + previousResult[column]
-                    end
-                    previousResult = d
-                end
-            end
-            @data = jsonData
-        else
-            @data  = $dataUtils.getCumulativeFlowData
-        end
+        @data  = $dataUtils.getCumulativeFlowData
 
         {title: @title, type: @type, stacked: @stacked, throughputData: @data, colors: @colors}.to_json
     end

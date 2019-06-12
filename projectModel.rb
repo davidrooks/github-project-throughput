@@ -1,6 +1,8 @@
 # Language: Ruby, Level: Level 3
+require 'singleton'
 
 class ProjectModel
+    include Singleton
 
     attr_accessor :board
     attr_accessor :issue_with_points

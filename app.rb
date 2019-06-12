@@ -10,7 +10,7 @@ require 'yaml'
 require './github.rb'
 require './configLoader.rb'
 require './apiRoutes.rb'
-require './modelAccessor.rb'
+require './projectModel.rb'
 require './dataUtils.rb'
 require 'date'
 require './githubProcessor.rb'
@@ -19,7 +19,7 @@ class App < Sinatra::Base
     $configLoader = ConfigLoader.new()
     $dataUtils = DataUtils.new
     $githubProcessor = GithubProcessor.new
-    $modelAccessor = ModelAccessor.new()
+    $projectModel = ProjectModel.instance
 
     if $configLoader.getConfigValue('useDummyData')
         puts ">>>>> using dummy Data"

@@ -1,13 +1,13 @@
 require './githubProcessor.rb'
-require './modelAccessor.rb'
+require './projectModel.rb'
 
 class DataUtils
 
     $githubProcessor = GithubProcessor.new
-    $modelAccessor = ModelAccessor.new
+    $projectModel = ProjectModel.instance
 
     def totalSprintPoints()
-        allColumns= $modelAccessor.getProjectModel.getTransformedIssuesWithSinglePoint
+        allColumns= $projectModel.getTransformedIssuesWithSinglePoint
         sprintColumns = $configLoader.getInSprintColumns
         overallTotalIssues = 0
 
@@ -43,7 +43,7 @@ class DataUtils
 
     def getPointsThroughputData()
         dataJson = $githubProcessor.getDataJsonWithPoints($configLoader.getThroughputColumn)
-        allColumns= $modelAccessor.getProjectModel.getIssueWithPoints
+        allColumns= $projectModel.getIssueWithPoints
         current = []
         total_done = 0
 
@@ -80,7 +80,7 @@ class DataUtils
 
     def getTotalInSprintIssues()
         sprintColumns = $configLoader.getInSprintColumns
-        board = $modelAccessor.getProjectModel.getBoard
+        board = $projectModel.getBoard
         overallTotalIssues = 0
 
         sprintColumns.each_with_index do |sprintColumn, index|
@@ -96,7 +96,7 @@ class DataUtils
     end
 
     def getTotalIssuesInAColumn(columnName)
-        board = $modelAccessor.getProjectModel.board
+        board = $projectModel.board
         overallTotalIssues = 0
 
         board.each_with_index do | boardColumn, i |

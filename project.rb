@@ -1,6 +1,7 @@
 # Language: Ruby, Level: Level 3
 require './github.rb'
-require './modelAccessor.rb'
+require './projectModel.rb'
+require './projectModel.rb'
 require './configLoader.rb'
 
 class Project < Github
@@ -9,7 +10,7 @@ class Project < Github
         super()
     end
 
-    $modelAccessor = ModelAccessor.new
+    $projectModel = ProjectModel.instance
     $configLoader = ConfigLoader.new()
     PROJECT_PATH = '/projects/' + $configLoader.getConfigValue('PROJECT') + '/columns'
     PROJECTS_PATH = '/repos/' + $configLoader.getConfigValue('REPO') + '/projects'
@@ -48,12 +49,12 @@ class Project < Github
             @logger.debug e.backtrace
             @logger.debug '-----------------------'
         end
-        $modelAccessor.getProjectModel.board = board
+        $projectModel.board = board
     end
 
     def fetchPointsForInSprintIssues
         kanban = Hash.new()
-        board = $modelAccessor.getProjectModel.board
+        board = $projectModel.board
         issuesWithColumn = {}
         issuesWithHighestPoints = []
         currentIssue = 0
@@ -114,46 +115,19 @@ class Project < Github
                 end
             end
         end
-        $modelAccessor.getProjectModel.issue_with_points = issuesWithColumn
+        $projectModel.issue_with_points = issuesWithColumn
     end
 
-
-    def storePoints()
-        # store the state of the board start of the day and end of the day
-    end
-
-    def explanationField()
-    # This is to identify why the number of cards / points has increased in the Todo columns in the middle of the sprint
-    end
-
-    def sprintReport()
-        #
-    end
 
     def getBoard()
-        return $modelAccessor.getProjectModel.board
+        return $projectModel.board
     end
 
-    def estimatedSizeInColumns()
-        # Aim is to take the label "Estimate 2" and add them
-        # Also to fetch other type of cards and add them
-        # Also to fetch bug card and give them a pointer
-        # Also to fetch investigation cards and give them a pointer
-        # kanban = Hash.new()
-
-        # board = $modelAccessor.getProjectModel.board
-        #
-        # board.each do |column, cards|
-        #     cards.each do |card|
-        #
-        #     end
-        # end
-    end
 
     def transformDataWithSinglePoint()
       kanban = Hash.new()
 
-      board = $modelAccessor.getProjectModel.board
+      board = $projectModel.board
 
       board.each do |column, cards|
         cards.each do |card|
@@ -187,14 +161,14 @@ class Project < Github
       @logger.info 'Current ticket state...'
       @logger.info kanban.to_s
       @logger.info '=============================================='
-      $modelAccessor.getProjectModel.issues_with_single_point = kanban
+      $projectModel.issues_with_single_point = kanban
       return kanban
     end
 
     def transformDataWithPoints()
       kanban = Hash.new()
-      board = $modelAccessor.getProjectModel.board
-      issuesWithHighestPoints = $modelAccessor.getProjectModel.getIssueWithPoints
+      board = $projectModel.board
+      issuesWithHighestPoints = $projectModel.getIssueWithPoints
       board.each do |column, cards|
         cards.each do |card|
             opened_on = Date.parse(card['created_at'].to_s).iso8601
@@ -236,7 +210,7 @@ class Project < Github
       @logger.info kanban.to_s
       @logger.info '=============================================='
 
-      $modelAccessor.getProjectModel.issue_transformed_with_points = kanban
+      $projectModel.issue_transformed_with_points = kanban
       return kanban
     end
 end
