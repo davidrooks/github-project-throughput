@@ -22,11 +22,11 @@
                 <div class="d-flex col">
                     <div class="card w-100 text-white <%= @warn ? "bg-flat-color-1" : "bg-flat-color-1" %>">
                         <div class="card-body pb-0">
-                            <div class="stat-widget-one">
-                                <div class="stat-icon dib icon-center">
+                            <div class="stat-widget-one row">
+                                <div class="stat-icon dib">
                                     <i class="ti-calendar"></i>
                                 </div>
-                                <div class="stat-content dib">
+                                <div class="stat-content dib col">
                                     <h4 class="mb-0">
                                         <span class="date"><%= @projected_delivery_date %></span>
                                     </h4>
@@ -41,11 +41,11 @@
                 <div class="d-flex col">
                     <div class="card w-100 text-white bg-flat-color-1"">
                         <div class="card-body pb-0">
-                            <div class="stat-widget-one">
-                                <div class="stat-icon dib icon-center">
+                            <div class="stat-widget-one row">
+                                <div class="stat-icon dib">
                                     <i class="ti-alarm-clock"></i>
                                 </div>
-                                <div class="stat-content dib">
+                                <div class="stat-content dib col">
                                     <span class="count"><%= @work_days_required %></span>
                                     <p class="text-light">Work Days Required</p>
                                     <p class="text-light">(based on current points throughput)</p>
@@ -59,11 +59,11 @@
                 <div class="d-flex col">
                     <div class="card w-100 text-white bg-flat-color-1">
                         <div class="card-body pb-0">
-                            <div class="stat-widget-one">
-                                <div class="stat-icon dib icon-center">
+                            <div class="stat-widget-one row">
+                                <div class="stat-icon dib">
                                     <i class="ti-github"></i>
                                 </div>
-                                <div class="stat-content dib">
+                                <div class="stat-content dib col">
                                     <h4 class="mb-0">
                                         <span class="count"><%= @closed_tickets %></span>
                                         <p class="text-light">Done tickets</p>
@@ -81,16 +81,15 @@
 
                 <div class="d-flex col">
                     <div class="card w-100 text-white bg-flat-color-1">
-                        <div class="card-body">
-                            <div class="stat-widget-one">
-                                <div class="stat-icon dib icon-center">
+                        <div class="card-body pb-0">
+                            <div class="stat-widget-one row">
+                                <div class="stat-icon dib">
                                     <i class="ti-pulse"></i>
                                 </div>
-                                <div class="stat-content dib">
+                                <div class="stat-content dib col">
                                     <span class="count"><%= @ticketsThroughput %></span>
                                     <p class="text-light" data-html="true" data-toggle="tooltip" title="Throughput column is: <br/> <u><%= @throughputColumns %></u>"> Throughput<br />(tickets per day)</p>
-                                </div>
-                                <div class="stat-content dib">
+
                                     <span class="count"><%= @pointsThroughput %></span>
                                     <p class="text-light" data-html="true" data-toggle="tooltip" title="Throughput column is: <br/> <u><%= @throughputColumns %></u>"> Throughput<br />(points per day)</p>
                                 </div>
@@ -103,11 +102,11 @@
                 <div class="d-flex col">
                     <div class="card w-100 text-white bg-flat-color-1">
                         <div class="card-body">
-                            <div class="stat-widget-one">
-                                <div class="stat-icon dib icon-center">
+                            <div class="stat-widget-one row">
+                                <div class="stat-icon dib">
                                     <i class="ti-dashboard"></i>
                                 </div>
-                                <div class="stat-content dib">
+                                <div class="stat-content dib col">
                                     <span class="count"><%= @totalSprintPoints %></span>
                                     <p class="text-light" data-html="true" data-toggle="tooltip" title="Sum of all these columns points: <br/> <u><%= @currentSprintColumns %></u>">
                                         Total Points remaining<br />in the current sprint

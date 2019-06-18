@@ -10,12 +10,16 @@
 * License URI: http://www.gnu.org/licenses/gpl-2.0.html
 * Tags: html, themplate, Sufee-Admin
 --------------------------------------------------------- */
-
+.container {
+    max-width: 1741px;
+}
 .text-muted{
     height: 57px;
 }
-.icon-center{
-    margin-left: 29%;
+
+.stat-icon{
+    padding-top: 40px;
+    padding-left: 10px;
 }
 /* Bootstrap */
 @import url(../css/animate.css);
@@ -1688,9 +1692,6 @@ header .form-inline {
 .dib {
   display: inline-block; }
 
-.stat-widget-one .stat-icon {
-  vertical-align: top; }
-
 .stat-widget-one .stat-icon i {
   font-size: 30px;
   border-width: 3px;
@@ -1699,10 +1700,6 @@ header .form-inline {
   padding: 15px;
   font-weight: 900;
   display: inline-block; }
-
-.stat-widget-one .stat-content {
-  margin-left: 30px;
-  margin-top: 7px; }
 
 .stat-widget-one .stat-text {
   font-size: 14px;
@@ -2012,7 +2009,7 @@ header .form-inline {
     margin-left: 15px; }
 
   .card-body {
-    padding: 15px; }
+    padding: 15px 15px 0 15px !important; }
 
   .badges button {
     margin: 2px 0; } }
