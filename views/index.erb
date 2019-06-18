@@ -1,17 +1,7 @@
 <!doctype html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <%= erb :imports %>
     <title><%= @title %></title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link rel="stylesheet" href="assets/css/normalize.css">
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/font-awesome.min.css">
-    <link rel="stylesheet" href="assets/css/themify-icons.css">
-    <link rel="stylesheet" href="assets/css/flag-icon.min.css">
-    <link rel="stylesheet" href="assets/scss/style.css">
 </head>
 <body>
         <%= erb :menu %>
@@ -145,10 +135,6 @@
             </div>
         </div> <!-- .content -->
 
-    <script src="assets/js/vendor/jquery-2.1.4.min.js"></script>
-    <script src="assets/js/popper.min.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChart);
@@ -159,7 +145,7 @@
               title: '',
               legend: {position: 'none'},
               colors: <%= @colors %>,
-              chartArea: {width: '900', top: '1%'},
+              chartArea: {width: '1500', top: '1%'},
               hAxis: {title: '', titleTextStyle: {color: '#333'}, showTextEvery: 10},
               vAxis: {title: 'Issues', minValue: 0},
             };
